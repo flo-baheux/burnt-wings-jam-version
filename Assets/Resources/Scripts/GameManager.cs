@@ -28,13 +28,6 @@ public class GameManager : MonoBehaviour
     sceneController = new SceneController();
     if (gamesceneToLoad != null)
       sceneController.LoadGameScene(gamesceneToLoad, (AsyncOperation sceneLoad) => SetupForLevel());
-
-    // else
-    //   sceneController.LoadMainMenu((AsyncOperation sceneLoad) =>
-    //   {
-    //     // audioController = GetComponent<MainAudioController>();
-    //     // audioController.PlayDefaultAmbiantSounds();
-    //   });
   }
 
   private void SetupForLevel()
@@ -64,10 +57,14 @@ public class GameManager : MonoBehaviour
 
   void HandlePlayerDeath(Player player)
   {
-    Debug.Log("PLAYER DEAD - MORT MORT MORT");
     player.state.deadState.OnEnter -= HandlePlayerDeath;
-    Destroy(player);
-    sceneController.ReloadCurrentScene((AsyncOperation sceneLoad) => SetupForLevel());
+    Destroy(player.gameObject);
+    Debug.Log("you died mofo - will reload current scene from here");
+    sceneController.ReloadCurrentScene((AsyncOperation sceneLoad) =>
+    {
+      Debug.Log("Callback after reloadcurrentscene - NEW SCENE LOADED");
+      SetupForLevel();
+    });
   }
 
   public void SetLatestCheckpoint(Checkpoint checkpoint)

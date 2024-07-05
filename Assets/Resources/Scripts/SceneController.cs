@@ -4,33 +4,57 @@ using UnityEngine.SceneManagement;
 
 public class SceneController
 {
+  private bool IsLoading = false;
+  private Action<AsyncOperation> SetIsLoadingFalseCallback;
+
+  public SceneController() =>
+    SetIsLoadingFalseCallback = (AsyncOperation _) => IsLoading = false;
+
   public void LoadMainMenu(Action<AsyncOperation> callback)
   {
-    SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive).completed += callback;
+    if (IsLoading) return;
+    IsLoading = true;
+    AsyncOperation asyncOp = SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
+    asyncOp.completed += callback;
+    asyncOp.completed += SetIsLoadingFalseCallback;
   }
 
   public void UnloadMainMenu(Action<AsyncOperation> callback)
   {
-    SceneManager.UnloadSceneAsync("MainMenu").completed += callback;
+    if (IsLoading) return;
+    IsLoading = true;
+    AsyncOperation asyncOp = SceneManager.UnloadSceneAsync("MainMenu");
+    asyncOp.completed += callback;
+    asyncOp.completed += SetIsLoadingFalseCallback;
   }
 
   public void LoadGameScene(string sceneName, Action<AsyncOperation> callback = null)
   {
-    AsyncOperation sceneLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-    sceneLoad.completed += callback;
-    sceneLoad.completed +=
-    (AsyncOperation sceneLoad) =>
+    if (IsLoading) return;
+    IsLoading = true;
+    AsyncOperation asyncOp = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+    asyncOp.completed += callback;
+    asyncOp.completed +=
+    (AsyncOperation asyncOp) =>
     {
       SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
       SceneManager.LoadScene("IngameHUD", LoadSceneMode.Additive);
     };
+    asyncOp.completed += SetIsLoadingFalseCallback;
   }
 
   public void ReloadCurrentScene(Action<AsyncOperation> callback = null)
   {
     string currentSceneName = SceneManager.GetActiveScene().name;
+    if (IsLoading) return;
+    IsLoading = true;
     SceneManager.UnloadSceneAsync(currentSceneName);
-    SceneManager.LoadSceneAsync(currentSceneName, LoadSceneMode.Additive).completed += callback;
+    AsyncOperation asyncOp = SceneManager.LoadSceneAsync(currentSceneName, LoadSceneMode.Additive);
+    asyncOp.completed += callback;
+    asyncOp.completed +=
+      (AsyncOperation asyncOp) =>
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(currentSceneName));
+    asyncOp.completed += SetIsLoadingFalseCallback;
   }
 
   public void LoadPauseScene(Action<AsyncOperation> callback = null)
