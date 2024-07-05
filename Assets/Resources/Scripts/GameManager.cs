@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
 
   // CHARACTERS
   [SerializeField] private GameObject playerPrefab;
-  private GameObject player;
+  private Player player;
 
   // GAMEPLAY
   private Vector2 latestCheckpointPosition;
@@ -27,14 +27,7 @@ public class GameManager : MonoBehaviour
   {
     sceneController = new SceneController();
     if (gamesceneToLoad != null)
-      sceneController.LoadGameScene(gamesceneToLoad, (AsyncOperation sceneLoad) =>
-      {
-        GameObject spawnPoint = GameObject.FindGameObjectWithTag("Spawn");
-
-        player = Instantiate(playerPrefab, spawnPoint.transform.position, spawnPoint.transform.rotation);
-        vcam.Follow = player.transform;
-        vcam.LookAt = player.transform;
-      });
+      sceneController.LoadGameScene(gamesceneToLoad, (AsyncOperation sceneLoad) => SetupForLevel());
 
     // else
     //   sceneController.LoadMainMenu((AsyncOperation sceneLoad) =>
@@ -42,6 +35,16 @@ public class GameManager : MonoBehaviour
     //     // audioController = GetComponent<MainAudioController>();
     //     // audioController.PlayDefaultAmbiantSounds();
     //   });
+  }
+
+  private void SetupForLevel()
+  {
+    GameObject spawnPoint = GameObject.FindGameObjectWithTag("Spawn");
+
+    player = Instantiate(playerPrefab, spawnPoint.transform.position, spawnPoint.transform.rotation).GetComponent<Player>();
+    vcam.Follow = player.transform;
+    vcam.LookAt = player.transform;
+    player.state.deadState.OnEnter += HandlePlayerDeath;
   }
 
   public void StartGame()
@@ -52,25 +55,26 @@ public class GameManager : MonoBehaviour
 
     //   // SPAWN PLAYER 1
 
-    //   // Player.state.deadState.OnEnter += HandlePlayerDeath;
+
     //   // Player.OnCheckpointActivated += HandleCheckpointActivated;
 
     //   // SpawnPlayerInScene(sceneToLoad);
     // });
   }
 
-  void HandlePlayerDeath(Player player) =>
-    StartCoroutine(RespawnAfterXSecs(3));
-
-  IEnumerator RespawnAfterXSecs(int secondsBeforeRespawn)
+  void HandlePlayerDeath(Player player)
   {
-    yield return new WaitForSeconds(secondsBeforeRespawn);
-    Debug.LogError("RESPAWN - Not Implemented");
-    // RESPAWN
+    Debug.Log("PLAYER DEAD - MORT MORT MORT");
+    player.state.deadState.OnEnter -= HandlePlayerDeath;
+    Destroy(player);
+    sceneController.ReloadCurrentScene((AsyncOperation sceneLoad) => SetupForLevel());
   }
 
-  void HandleCheckpointActivated(GameObject checkpoint)
-    => latestCheckpointPosition = checkpoint.transform.position;
+  public void SetLatestCheckpoint(Checkpoint checkpoint)
+  {
+    Debug.Log("Checkpoint saved");
+    latestCheckpointPosition = checkpoint.transform.position;
+  }
 
   public void PauseResumeGame()
   {

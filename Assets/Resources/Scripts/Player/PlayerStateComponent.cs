@@ -8,6 +8,7 @@ public class PlayerStateComponent : MonoBehaviour
 
   public PlayerGroundedState groundedState { get; private set; }
   public PlayerJumpingState jumpingState { get; private set; }
+  public PlayerDashingState dashingState { get; private set; }
   public PlayerDeadState deadState { get; private set; }
 
   private Dictionary<State, PlayerState> states;
@@ -19,20 +20,29 @@ public class PlayerStateComponent : MonoBehaviour
     Player = GetComponent<Player>();
     groundedState = new PlayerGroundedState(Player);
     jumpingState = new PlayerJumpingState(Player);
+    dashingState = new PlayerDashingState(Player);
     deadState = new PlayerDeadState(Player);
 
     states = new Dictionary<State, PlayerState>() {
       {State.GROUNDED, groundedState},
       {State.JUMPING, jumpingState},
+      {State.DASHING, dashingState},
       {State.DEAD, deadState},
     };
 
     currentState = jumpingState;
   }
 
-  public void Update()
+  void Update()
   {
     State? newState = currentState.CustomUpdate();
+    if (newState.HasValue)
+      TransitionToState(newState.Value);
+  }
+
+  void FixedUpdate()
+  {
+    State? newState = currentState.CustomFixedUpdate();
     if (newState.HasValue)
       TransitionToState(newState.Value);
   }

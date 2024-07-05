@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerJumpingState : PlayerState
 {
+  private bool cancelJump = false;
+
   public PlayerJumpingState(Player player) : base(player)
   {
     this.state = State.JUMPING;
@@ -12,14 +14,21 @@ public class PlayerJumpingState : PlayerState
     if (Player.IsGrounded() && Player.rigidBody.velocity.y <= 0.1f)
       return State.GROUNDED;
 
-    if (Player.controlsEnabled)
+    if (Player.controlsEnabled && Player.playerInput.actions["Jump"].WasReleasedThisFrame())
+      cancelJump = true;
+
+    return base.CustomUpdate();
+  }
+
+  public override State? CustomFixedUpdate()
+  {
+    if (cancelJump)
     {
-      if (Player.playerInput.actions["Jump"].WasReleasedThisFrame())
-        Player.rigidBody.velocity = new Vector2(Player.rigidBody.velocity.x, -Player.FallSpeed);
+      cancelJump = false;
+      Player.rigidBody.velocity = new Vector2(Player.rigidBody.velocity.x, -Player.FallSpeed);
     }
 
     Player.rigidBody.velocity = new Vector2(Player.rigidBody.velocity.x, Mathf.Max(Player.rigidBody.velocity.y, -Player.FallSpeed));
-
-    return null;
+    return base.CustomFixedUpdate();
   }
 }

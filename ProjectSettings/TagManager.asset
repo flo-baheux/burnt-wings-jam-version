@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Spawn
   - Checkpoint
+  - Threat
   layers:
   - Default
   - TransparentFX

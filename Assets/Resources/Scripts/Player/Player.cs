@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,6 +13,10 @@ public class Player : MonoBehaviour
   public float FallSpeed => fallSpeed;
   [SerializeField] private float runningSpeed = 12f;
   public float RunningSpeed => runningSpeed;
+  [SerializeField] private float dashStrength = 40f;
+  public float DashStrength => dashStrength;
+  public int dashesLeft = 3;
+  public Vector2 movementVector = Vector2.zero;
 
   private bool facingRight = true;
   public bool controlsEnabled = true;
@@ -46,19 +52,14 @@ public class Player : MonoBehaviour
 
   void Update()
   {
+
     if (controlsEnabled)
     {
-      float horizontalInput = playerInput.actions["Move"].ReadValue<float>();
-
-      if (horizontalInput > 0)
+      movementVector = playerInput.actions["Move"].ReadValue<Vector2>();
+      if (movementVector.x > 0)
         facingRight = true;
-      else if (horizontalInput < 0)
+      else if (movementVector.x < 0)
         facingRight = false;
-      float horizontalVelocity = horizontalInput * runningSpeed;
-
-      // FIXME: Use force instead of setting velocity directly?
-      rigidBody.velocity = new Vector2(horizontalVelocity, rigidBody.velocity.y);
-
       // animator.SetFloat("HorizontalInput", Math.Abs(horizontalInput));
     }
 
@@ -69,12 +70,25 @@ public class Player : MonoBehaviour
       gameplayManager.PauseResumeGame();
 
     // use facingRight to rotate character sprite to face left/right
+
+    if (playerInput.actions["dash"].WasPressedThisFrame() && dashesLeft > 0 && movementVector != Vector2.zero)
+      state.TransitionToState(State.DASHING);
+  }
+
+  void FixedUpdate()
+  {
+    if (controlsEnabled)
+    {
+      float horizontalVelocity = movementVector.x * runningSpeed;
+      // FIXME: Use force instead of setting velocity directly?
+      rigidBody.velocity = new Vector2(horizontalVelocity, rigidBody.velocity.y);
+    }
   }
 
   public bool IsGrounded()
   {
     Vector2 center = new(mainCollider.bounds.center.x, mainCollider.bounds.min.y);
-    Vector2 size = new(mainCollider.bounds.size.x + 0.2f, 0.05f);
+    Vector2 size = new(mainCollider.bounds.size.x, 0.05f);
     RaycastHit2D raycastHit = Physics2D.BoxCast(center, size, 0f, Vector2.down, 0f, LayerMask.GetMask("Ground"));
     return raycastHit.collider;
   }
@@ -88,8 +102,8 @@ public class Player : MonoBehaviour
 
   public void OnTriggerEnter2D(Collider2D other)
   {
-    // if (other.gameObject.TryGetComponent(out Checkpoint checkpoint))
-    //   OnCheckpointActivated?.Invoke(checkpoint);
+    if (other.CompareTag("Threat"))
+      state.TransitionToState(State.DEAD);
   }
 
   private void OnTriggerExit2D(Collider2D other)

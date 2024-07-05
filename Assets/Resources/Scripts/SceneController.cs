@@ -26,6 +26,13 @@ public class SceneController
     };
   }
 
+  public void ReloadCurrentScene(Action<AsyncOperation> callback = null)
+  {
+    string currentSceneName = SceneManager.GetActiveScene().name;
+    SceneManager.UnloadSceneAsync(currentSceneName);
+    SceneManager.LoadSceneAsync(currentSceneName, LoadSceneMode.Additive).completed += callback;
+  }
+
   public void LoadPauseScene(Action<AsyncOperation> callback = null)
     => SceneManager.LoadSceneAsync("IngameMenu", LoadSceneMode.Additive).completed += callback;
 

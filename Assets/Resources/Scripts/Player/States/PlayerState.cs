@@ -4,7 +4,8 @@ public enum State
 {
   DEAD,
   GROUNDED,
-  JUMPING
+  JUMPING,
+  DASHING
 };
 
 public abstract class PlayerState
@@ -12,23 +13,14 @@ public abstract class PlayerState
   public State state;
   protected Player Player;
 
-  public PlayerState(Player player)
-  {
-    Player = player;
-  }
+  public PlayerState(Player player) => Player = player;
 
   public event Action<Player> OnEnter;
   public event Action<Player> OnExit;
 
-  public virtual void Enter()
-  {
-    OnEnter?.Invoke(Player);
-  }
+  public virtual State? CustomUpdate() => null;
+  public virtual State? CustomFixedUpdate() => null;
 
-  public abstract State? CustomUpdate();
-
-  public virtual void Exit()
-  {
-    OnExit?.Invoke(Player);
-  }
+  public virtual void Enter() => OnEnter?.Invoke(Player);
+  public virtual void Exit() => OnExit?.Invoke(Player);
 }

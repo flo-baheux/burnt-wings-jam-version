@@ -12,17 +12,11 @@ public class PlayerGroundedState : PlayerState
   public override State? CustomUpdate()
   {
     bool jumpPressed = Player.playerInput.actions["Jump"].WasPressedThisFrame();
-    // bool movementPressed = Player.playerInput.actions["Move"].ReadValue<float>() != 0;
-
-    // // Idle => freeze pos X to avoid sliding on slopes
-    // if (!jumpPressed && !movementPressed && Player.IsGrounded())
-    //   Player.rigidBody.constraints |= RigidbodyConstraints2D.FreezePositionX;
-    // else
-    //   Player.rigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
 
     if (Player.controlsEnabled && jumpPressed)
     {
       float jumpForce = Mathf.Sqrt(Player.JumpHeight * -2 * (Physics2D.gravity.y * Player.rigidBody.gravityScale));
+      // Using AddForce (applying force once) is fine in update method - don't move it out
       Player.rigidBody.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
       return State.JUMPING;
     }
