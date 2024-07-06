@@ -368,7 +368,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vcam: {fileID: 1554378169}
-  gamesceneToLoad: Playground
+  gamesceneToLoad: LevelSelection
   playerPrefab: {fileID: 2371077000446278421, guid: fbbdc83ef4e7b0d459db4a61ff21201c, type: 3}
 --- !u!4 &1485197712
 Transform:

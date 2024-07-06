@@ -79,6 +79,7 @@ GameObject:
   - component: {fileID: 8852265309379143288}
   - component: {fileID: 3043981574277585662}
   - component: {fileID: 1658019344587354579}
+  - component: {fileID: 8117689668685258042}
   - component: {fileID: 237211486974768608}
   - component: {fileID: 7496919192176471581}
   - component: {fileID: 1515380072639808174}
@@ -173,8 +174,7 @@ MonoBehaviour:
   fallSpeed: 15
   runningSpeed: 20
   dashStrength: 40
-  dashesLeft: 3
-  canDash: 1
+  overheatRunningSpeed: 25
   movementVector: {x: 0, y: 0}
   controlsEnabled: 1
 --- !u!114 &1658019344587354579
@@ -189,6 +189,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d9b131f8d550be43997f54d2ca5bd9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8117689668685258042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2371077000446278421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cffb6060086da842b53867e7630c37b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minHeat: 0
+  maxHeat: 3
+  currentHeat: 0
+  overheatTimeBeforeBurnout: 3
+  overheatMode: 0
 --- !u!50 &237211486974768608
 Rigidbody2D:
   serializedVersion: 4
@@ -328,6 +345,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 88617c70-1894-41fb-9f73-e366f1ce931d
     m_ActionName: Player/Jump[/Keyboard/space,/XInputControllerWindows/buttonSouth]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b8b3101b-75f5-4078-bf0e-42f840d66d33
+    m_ActionName: Player/Dash[/Keyboard/ctrl,/XInputControllerWindows/leftShoulder,/XInputControllerWindows/rightShoulder]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard
   m_DefaultActionMap: Player

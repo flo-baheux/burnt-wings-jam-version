@@ -13,7 +13,7 @@ public class DeathWallSpawner : MonoBehaviour
 {
   [SerializeField] private GameObject DeathWallPrefab;
   [SerializeField] private DeathWallExpensionDirection expensionDirection;
-  [SerializeField] private int expensionSpeed = 1;
+  [SerializeField] private float expensionSpeed = 1;
 
   private Vector2 lastSpawnedAt = Vector2.zero;
   // We gonna spawn many ones as the wall expands.
@@ -44,7 +44,7 @@ public class DeathWallSpawner : MonoBehaviour
       default:
         break;
     }
-    InvokeRepeating("SpawnFireWall", 0, 1 / expensionSpeed);
+    InvokeRepeating("SpawnFireWall", 0, 1f / expensionSpeed);
   }
 
   void SpawnFireWall()

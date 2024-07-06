@@ -8,14 +8,13 @@ public class GameManager : MonoBehaviour
   [SerializeField] private CinemachineVirtualCamera vcam;
 
   // SCENES SETUP
-  [SerializeField] private string gamesceneToLoad;
+  // [SerializeField] private string gamesceneToLoad;
 
   // CHARACTERS
   [SerializeField] private GameObject playerPrefab;
   private Player player;
 
   // GAMEPLAY
-  private Vector2 latestCheckpointPosition;
 
   // CONTROLLERS
   private MainAudioController audioController;
@@ -26,14 +25,12 @@ public class GameManager : MonoBehaviour
   public void Awake()
   {
     sceneController = new SceneController();
-    if (gamesceneToLoad != null)
-      sceneController.LoadGameScene(gamesceneToLoad, (AsyncOperation sceneLoad) => SetupForLevel());
+    sceneController.LoadLevelSelection();
   }
 
   private void SetupForLevel()
   {
     GameObject spawnPoint = GameObject.FindGameObjectWithTag("Spawn");
-
     player = Instantiate(playerPrefab, spawnPoint.transform.position, spawnPoint.transform.rotation).GetComponent<Player>();
     vcam.Follow = player.transform;
     vcam.LookAt = player.transform;
@@ -59,18 +56,7 @@ public class GameManager : MonoBehaviour
   {
     player.state.deadState.OnEnter -= HandlePlayerDeath;
     Destroy(player.gameObject);
-    Debug.Log("you died mofo - will reload current scene from here");
-    sceneController.ReloadCurrentScene((AsyncOperation sceneLoad) =>
-    {
-      Debug.Log("Callback after reloadcurrentscene - NEW SCENE LOADED");
-      SetupForLevel();
-    });
-  }
-
-  public void SetLatestCheckpoint(Checkpoint checkpoint)
-  {
-    Debug.Log("Checkpoint saved");
-    latestCheckpointPosition = checkpoint.transform.position;
+    sceneController.ReloadCurrentScene((AsyncOperation sceneLoad) => SetupForLevel());
   }
 
   public void PauseResumeGame()
@@ -90,5 +76,10 @@ public class GameManager : MonoBehaviour
       });
     }
     gamePaused = !gamePaused;
+  }
+
+  public void StartLevel(int world, int level)
+  {
+    sceneController.LoadGameScene($"world_{world}_level_{level}", (AsyncOperation sceneLoad) => SetupForLevel());
   }
 }
