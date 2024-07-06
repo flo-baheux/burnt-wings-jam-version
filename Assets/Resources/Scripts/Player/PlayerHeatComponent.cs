@@ -12,9 +12,10 @@ public class PlayerHeatComponent : MonoBehaviour
   public Action OverheatTriggered;
   public Action burnoutTriggered;
 
-
   public int minHeat = 0;
-  public int maxHeat = 3;
+  public int maxHeat = 100;
+  public int overheatRecoveryThreshold = 80;
+  public int overheatRecoveryThresholdDecreaseStep = 5;
   public int currentHeat = 0;
   public float overheatTimeBeforeBurnout = 3f;
   public bool overheatMode = false;
@@ -23,13 +24,14 @@ public class PlayerHeatComponent : MonoBehaviour
   {
     currentHeat = minHeat;
     player = GetComponent<Player>();
+    OverheatTriggered += () => Debug.Log("Overheat Triggered");
   }
 
   // Increase heat. However if the heat reaches max, start overheat mode.
   // If the heat increases further, burnout is triggered.
-  public void IncreaseHeat()
+  public void IncreaseHeat(int value)
   {
-    currentHeat = Math.Clamp(currentHeat + 1, minHeat, maxHeat);
+    currentHeat = Math.Clamp(currentHeat + value, minHeat, maxHeat);
     HeatIncreased?.Invoke(currentHeat);
     if (overheatMode)
       burnoutTriggered?.Invoke();
@@ -43,23 +45,24 @@ public class PlayerHeatComponent : MonoBehaviour
   }
 
   // Decrease heat. However, also increase minHeat.
-  public void DecreaseHeat()
+  public void DecreaseHeat(int value)
   {
-    currentHeat = Math.Clamp(currentHeat - 1, minHeat, maxHeat);
+    currentHeat = Math.Clamp(currentHeat - value, minHeat, maxHeat);
     HeatDecreased?.Invoke(currentHeat);
-    if (overheatMode)
+
+    if (overheatMode && currentHeat <= overheatRecoveryThreshold)
+    {
       overheatMode = false;
-    minHeat = Math.Clamp(minHeat + 1, 0, maxHeat);
-    if (minHeat == maxHeat)
-      burnoutTriggered?.Invoke();
+      overheatRecoveryThreshold -= overheatRecoveryThresholdDecreaseStep;
+    }
   }
 
-  // Wait x sec - if still in overheat, triggers a burnout
   private IEnumerator Overheat()
   {
-    Debug.Log("OVERHEAT OMG");
     yield return new WaitForSeconds(overheatTimeBeforeBurnout);
     if (overheatMode)
       burnoutTriggered?.Invoke();
   }
+
+  public bool IsBeyondHeatThreshold() => currentHeat > overheatRecoveryThreshold;
 }

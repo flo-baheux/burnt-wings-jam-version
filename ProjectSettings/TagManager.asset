@@ -5,8 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Spawn
-  - Checkpoint
   - Threat
+  - LevelEnd
   layers:
   - Default
   - TransparentFX

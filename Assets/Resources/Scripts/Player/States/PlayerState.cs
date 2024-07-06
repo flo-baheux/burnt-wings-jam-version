@@ -5,7 +5,8 @@ public enum State
   DEAD,
   GROUNDED,
   JUMPING,
-  DASHING
+  DASHING,
+  HEAT_RECOVERY
 };
 
 public abstract class PlayerState

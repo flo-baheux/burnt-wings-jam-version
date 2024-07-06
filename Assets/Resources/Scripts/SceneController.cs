@@ -46,13 +46,14 @@ public class SceneController
     if (IsLoading) return;
     IsLoading = true;
 
-
     AsyncOperation asyncOp = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
     asyncOp.completed +=
     (AsyncOperation asyncOp) =>
     {
-      if (SceneManager.GetActiveScene().name == "LevelSelection")
-        SceneManager.UnloadSceneAsync("LevelSelection");
+
+      string activeScene = SceneManager.GetActiveScene().name;
+      if (activeScene != "MainMenu" && activeScene != "SceneManager")
+        SceneManager.UnloadSceneAsync(activeScene);
       SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
       SceneManager.LoadScene("IngameHUD", LoadSceneMode.Additive);
     };
