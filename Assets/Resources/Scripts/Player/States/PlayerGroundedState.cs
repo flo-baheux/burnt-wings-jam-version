@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class PlayerGroundedState : PlayerState
 {
-  private float currentY;
-
   public PlayerGroundedState(Player player) : base(player)
   {
     this.state = State.GROUNDED;
@@ -12,6 +10,7 @@ public class PlayerGroundedState : PlayerState
   public override State? CustomUpdate()
   {
     bool jumpPressed = Player.playerInput.actions["Jump"].WasPressedThisFrame();
+    bool dashPressed = Player.playerInput.actions["Dash"].WasPressedThisFrame();
 
     if (Player.controlsEnabled && jumpPressed)
     {
@@ -20,6 +19,9 @@ public class PlayerGroundedState : PlayerState
       Player.rigidBody.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
       return State.JUMPING;
     }
+
+    if (Player.controlsEnabled && dashPressed)
+      Player.heat.DecreaseHeat(3);
 
     if (!Player.IsGrounded())
       return State.JUMPING;

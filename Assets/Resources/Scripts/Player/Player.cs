@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
 
   public float overheatRunningSpeed = 20f;
 
+
   public Vector2 movementVector = Vector2.zero;
 
   private bool facingRight = true;
@@ -26,29 +27,22 @@ public class Player : MonoBehaviour
   [NonSerialized] public PlayerInput playerInput;
   public PlayerStateComponent state { get; private set; }
   public PlayerHeatComponent heat { get; private set; }
-
-  private CircleCollider2D mainCollider;
-  // private Animator animator;
+  private CapsuleCollider2D mainCollider;
+  public Animator animator;
+  private SpriteRenderer spriteRenderer;
 
   // Gameplay Manager
   private GameManager gameplayManager;
-
-  // Events
-  public event Action<Vector2> OnCheckpointActivated;
-  public event Action<Player> OnInteract;
-  public event Action<GameObject> OnEnterInteractible;
-  public event Action<GameObject> OnExitInteractible;
-
-  public GameObject Climbable { get; private set; }
 
   void Awake()
   {
     state = GetComponent<PlayerStateComponent>();
     heat = GetComponent<PlayerHeatComponent>();
     rigidBody = GetComponent<Rigidbody2D>();
-    mainCollider = GetComponent<CircleCollider2D>();
+    mainCollider = GetComponent<CapsuleCollider2D>();
     playerInput = GetComponent<PlayerInput>();
-    // animator = GetComponent<Animator>();
+    animator = GetComponent<Animator>();
+    spriteRenderer = GetComponent<SpriteRenderer>();
     gameplayManager = GameObject.Find("GameManager").GetComponent<GameManager>();
   }
 
@@ -67,20 +61,17 @@ public class Player : MonoBehaviour
         facingRight = true;
       else if (movementVector.x < 0)
         facingRight = false;
-      // animator.SetFloat("HorizontalInput", Math.Abs(horizontalInput));
     }
 
-    if (heat.overheatMode)
-
-
-      // animator.SetFloat("VelocityY", rigidBody.velocity.y);
-      // animator.SetBool("IsGrounded", state.currentState.state == State.GROUNDED);
-      // animator.SetBool("IsDead", state.currentState.state == State.DEAD);
-      if (playerInput.actions["Pause"].WasPressedThisFrame())
-        gameplayManager.PauseResumeGame();
+    spriteRenderer.flipX = !facingRight;
+    animator.SetFloat("xAbsInput", Math.Abs(movementVector.x));
+    animator.SetFloat("yVelocity", rigidBody.velocity.y);
+    animator.SetBool("IsGrounded", state.currentState.state == State.GROUNDED);
+    // animator.SetBool("IsDead", state.currentState.state == State.DEAD);
+    if (playerInput.actions["Pause"].WasPressedThisFrame())
+      gameplayManager.PauseResumeGame();
 
     // use facingRight to rotate character sprite to face left/right
-
     if (playerInput.actions["dash"].WasPressedThisFrame())
     {
       // If not moving and mashing, decrease heat.
@@ -94,7 +85,6 @@ public class Player : MonoBehaviour
     if (controlsEnabled)
     {
       float horizontalVelocity = movementVector.x * (heat.overheatMode ? overheatRunningSpeed : runningSpeed);
-      // FIXME: Use force instead of setting velocity directly?
       rigidBody.velocity = new Vector2(horizontalVelocity, rigidBody.velocity.y);
     }
   }
@@ -118,5 +108,9 @@ public class Player : MonoBehaviour
   {
     if (other.CompareTag("Threat"))
       state.TransitionToState(State.DEAD);
+    if (other.CompareTag("LevelEnd"))
+      gameplayManager.StartNextLevel();
   }
+
+  public int GetCurrentDashCost() => gameplayManager.dashHeatCost;
 }

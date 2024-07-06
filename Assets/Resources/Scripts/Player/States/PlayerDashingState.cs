@@ -5,7 +5,8 @@ public class PlayerDashingState : PlayerState
   private float dashTime = 0.15f;
   private float initialGravityScale = 0f;
   private float dashTimer = 0f;
-  private float outOfDashGracePeriod = 0.1f;
+  private float enterGracePeriod = 0.20f;
+  private float exitGracePeriod = 0.01f;
   private bool isDashing = false, isGracePeriod = false;
 
   public PlayerDashingState(Player player) : base(player)
@@ -17,13 +18,16 @@ public class PlayerDashingState : PlayerState
   {
     base.Enter();
 
+    dashTimer = 0f;
     isDashing = true;
-    isGracePeriod = false;
-    Player.heat.IncreaseHeat();
+    isGracePeriod = true;
+    Player.animator.SetTrigger("Dash");
+    Player.heat.IncreaseHeat(Player.GetCurrentDashCost());
     initialGravityScale = Player.rigidBody.gravityScale;
     Player.rigidBody.gravityScale = 0f;
     Player.controlsEnabled = false;
-    Player.rigidBody.velocity = Player.movementVector * Player.DashStrength;
+    Player.rigidBody.velocity *= 0.1f;
+
   }
 
 
@@ -31,7 +35,18 @@ public class PlayerDashingState : PlayerState
   public override State? CustomUpdate()
   {
     // collision = early stop?
+    if (isGracePeriod && dashTimer <= enterGracePeriod)
+    {
+      dashTimer += Time.deltaTime;
+      return base.CustomUpdate();
+    }
 
+    if (isGracePeriod)
+    {
+      isGracePeriod = false;
+      dashTimer = 0f;
+      Player.rigidBody.velocity = Player.movementVector * Player.DashStrength;
+    }
 
     if (isDashing && dashTimer <= dashTime)
     {
@@ -39,20 +54,20 @@ public class PlayerDashingState : PlayerState
       return base.CustomUpdate();
     }
 
-    if (isDashing)
-    {
-      isDashing = false;
-      dashTimer = 0f;
-      isGracePeriod = true;
-      Player.controlsEnabled = true;
-      Player.rigidBody.velocity = Vector2.zero;
-    }
+    // if (isDashing)
+    // {
+    //   isDashing = false;
+    //   dashTimer = 0f;
+    //   isGracePeriod = true;
+    //   Player.controlsEnabled = true;
+    //   Player.rigidBody.velocity = Vector2.zero;
+    // }
 
-    if (isGracePeriod && dashTimer <= outOfDashGracePeriod)
-    {
-      dashTimer += Time.deltaTime;
-      return base.CustomUpdate();
-    }
+    // if (isGracePeriod && dashTimer <= exitGracePeriod)
+    // {
+    //   dashTimer += Time.deltaTime;
+    //   return base.CustomUpdate();
+    // }
 
     return State.JUMPING;
   }
@@ -61,9 +76,10 @@ public class PlayerDashingState : PlayerState
   {
     base.Exit();
 
-    dashTimer = 0f;
-    Player.controlsEnabled = true;
     Player.rigidBody.velocity = Vector2.zero;
+    Player.controlsEnabled = true;
     Player.rigidBody.gravityScale = initialGravityScale;
+    Player.animator.ResetTrigger("Dash");
+
   }
 }

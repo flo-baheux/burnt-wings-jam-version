@@ -14,6 +14,7 @@ public class DeathWallSpawner : MonoBehaviour
   [SerializeField] private GameObject DeathWallPrefab;
   [SerializeField] private DeathWallExpensionDirection expensionDirection;
   [SerializeField] private float expensionSpeed = 1;
+  private int zOrder = System.Int32.MaxValue;
 
   private Vector2 lastSpawnedAt = Vector2.zero;
   // We gonna spawn many ones as the wall expands.
@@ -50,18 +51,19 @@ public class DeathWallSpawner : MonoBehaviour
   void SpawnFireWall()
   {
     Vector2 newPos = GetNewSpawnPosition();
-    Instantiate(DeathWallPrefab, newPos, transform.rotation);
+    GameObject obj = Instantiate(DeathWallPrefab, newPos, transform.rotation);
     lastSpawnedAt = newPos;
+
   }
 
   Vector2 GetNewSpawnPosition()
   {
     return expensionDirection switch
     {
-      DeathWallExpensionDirection.UP => new Vector2(lastSpawnedAt.x + Random.Range(-1f, 1f), lastSpawnedAt.y + 1),
-      DeathWallExpensionDirection.DOWN => new Vector2(lastSpawnedAt.x + Random.Range(-1f, 1f), lastSpawnedAt.y - 1),
-      DeathWallExpensionDirection.LEFT => new Vector2(lastSpawnedAt.x - 1, lastSpawnedAt.y + Random.Range(-1f, 1f)),
-      DeathWallExpensionDirection.RIGHT => new Vector2(lastSpawnedAt.x + 1, lastSpawnedAt.y + Random.Range(-1f, 1f)),
+      DeathWallExpensionDirection.UP => new Vector2(lastSpawnedAt.x + Random.Range(-2f, 2f), lastSpawnedAt.y + 2),
+      DeathWallExpensionDirection.DOWN => new Vector2(lastSpawnedAt.x + Random.Range(-2f, 2f), lastSpawnedAt.y - 2),
+      DeathWallExpensionDirection.LEFT => new Vector2(lastSpawnedAt.x - 2, lastSpawnedAt.y + Random.Range(-2f, 2f)),
+      DeathWallExpensionDirection.RIGHT => new Vector2(lastSpawnedAt.x + 2, lastSpawnedAt.y + Random.Range(-2f, 2f)),
       _ => Vector2.zero,
     };
   }
