@@ -14,18 +14,9 @@ public class DeathWallSpawner : MonoBehaviour
   [SerializeField] private GameObject DeathWallPrefab;
   [SerializeField] private DeathWallExpensionDirection expensionDirection;
   [SerializeField] private float expensionSpeed = 1;
-  private int zOrder = System.Int32.MaxValue;
+  private int sortingOrder = System.Int16.MaxValue;
 
   private Vector2 lastSpawnedAt = Vector2.zero;
-  // We gonna spawn many ones as the wall expands.
-  // Assumption: the sprite itself is large enough, we don't bother with sprite
-
-  // We spawn one every x sec in the expensionDirection direction.
-  // it has to be slightly shifted sideway (going right -> few pixels top/bottom)
-  // Don't overdo it as it's not the final sprite + no anim yet.
-
-  // SOUND
-  // There is ONE fire sound emitter that has to be moved where the last one is spawned (?)
 
   void Start()
   {
@@ -50,20 +41,22 @@ public class DeathWallSpawner : MonoBehaviour
 
   void SpawnFireWall()
   {
+    Debug.Log(sortingOrder);
     Vector2 newPos = GetNewSpawnPosition();
-    GameObject obj = Instantiate(DeathWallPrefab, newPos, transform.rotation);
+    SpriteRenderer newWallSpriteRenderer = Instantiate(DeathWallPrefab, newPos, transform.rotation).GetComponent<SpriteRenderer>();
+    newWallSpriteRenderer.sortingOrder = sortingOrder;
+    sortingOrder--;
     lastSpawnedAt = newPos;
-
   }
 
   Vector2 GetNewSpawnPosition()
   {
     return expensionDirection switch
     {
-      DeathWallExpensionDirection.UP => new Vector2(lastSpawnedAt.x + Random.Range(-2f, 2f), lastSpawnedAt.y + 2),
-      DeathWallExpensionDirection.DOWN => new Vector2(lastSpawnedAt.x + Random.Range(-2f, 2f), lastSpawnedAt.y - 2),
-      DeathWallExpensionDirection.LEFT => new Vector2(lastSpawnedAt.x - 2, lastSpawnedAt.y + Random.Range(-2f, 2f)),
-      DeathWallExpensionDirection.RIGHT => new Vector2(lastSpawnedAt.x + 2, lastSpawnedAt.y + Random.Range(-2f, 2f)),
+      DeathWallExpensionDirection.UP => new Vector2(lastSpawnedAt.x + Random.Range(-2f, 2f), lastSpawnedAt.y + 0.8f),
+      DeathWallExpensionDirection.DOWN => new Vector2(lastSpawnedAt.x + Random.Range(-2f, 2f), lastSpawnedAt.y - 0.8f),
+      DeathWallExpensionDirection.LEFT => new Vector2(lastSpawnedAt.x - 0.8f, lastSpawnedAt.y + Random.Range(-2f, 2f)),
+      DeathWallExpensionDirection.RIGHT => new Vector2(lastSpawnedAt.x + 0.8f, lastSpawnedAt.y + Random.Range(-2f, 2f)),
       _ => Vector2.zero,
     };
   }

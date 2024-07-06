@@ -83,7 +83,7 @@ public class GameManager : MonoBehaviour
     if (!gamePaused)
     {
       Time.timeScale = 0;
-      // Player.controlsEnabled = false;
+      // player.controlsEnabled = false;
       sceneController.LoadPauseScene();
     }
     else
@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour
       sceneController.UnloadPauseScene((AsyncOperation _) =>
       {
         Time.timeScale = 1;
-        // Player.controlsEnabled = true;
+        // player.controlsEnabled = true;
       });
     }
     gamePaused = !gamePaused;
