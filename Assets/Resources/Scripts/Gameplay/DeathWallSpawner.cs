@@ -46,10 +46,13 @@ public class DeathWallSpawner : MonoBehaviour
     if (SceneManager.GetActiveScene().name == "SceneManager")
       return;
     Vector2 newPos = GetNewSpawnPosition();
-    SpriteRenderer newWallSpriteRenderer = Instantiate(DeathWallPrefab, newPos, transform.rotation).GetComponent<SpriteRenderer>();
+    GameObject newWall = Instantiate(DeathWallPrefab, newPos, transform.rotation);
+
+    SpriteRenderer newWallSpriteRenderer = newWall.GetComponent<SpriteRenderer>();
     newWallSpriteRenderer.sortingOrder = sortingOrder;
     sortingOrder--;
     lastSpawnedAt = newPos;
+    Destroy(newWall, 5);
   }
 
   Vector2 GetNewSpawnPosition()
