@@ -15,6 +15,8 @@ public class Player : MonoBehaviour
   public float DashStrength => dashStrength;
 
   public float overheatRunningSpeed = 20f;
+  public float heatCooldownRate = 10f;
+  [SerializeField] public GameObject coolOffParticles;
 
 
   public Vector2 movementVector = Vector2.zero;
@@ -30,6 +32,7 @@ public class Player : MonoBehaviour
   private CapsuleCollider2D mainCollider;
   public Animator animator;
   private SpriteRenderer spriteRenderer;
+  public ParticleSystem.EmissionModule particleEmission;
 
   // Gameplay Manager
   private GameManager gameplayManager;
@@ -43,7 +46,10 @@ public class Player : MonoBehaviour
     playerInput = GetComponent<PlayerInput>();
     animator = GetComponent<Animator>();
     spriteRenderer = GetComponent<SpriteRenderer>();
+    particleEmission = GetComponent<ParticleSystem>().emission;
     gameplayManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+    coolOffParticles.SetActive(false);
+    animator.keepAnimatorStateOnDisable = false;
   }
 
   void Start()
@@ -67,14 +73,13 @@ public class Player : MonoBehaviour
     animator.SetFloat("xAbsInput", Math.Abs(movementVector.x));
     animator.SetFloat("yVelocity", rigidBody.velocity.y);
     animator.SetBool("IsGrounded", state.currentState.state == State.GROUNDED);
-    // animator.SetBool("IsDead", state.currentState.state == State.DEAD);
+    animator.SetBool("IsCoolingOff", state.currentState.state == State.HEAT_RECOVERY);
+    animator.SetBool("Overheat", heat.IsBeyondHeatThreshold());
     if (playerInput.actions["Pause"].WasPressedThisFrame())
       gameplayManager.PauseResumeGame();
 
-    // use facingRight to rotate character sprite to face left/right
     if (playerInput.actions["dash"].WasPressedThisFrame())
     {
-      // If not moving and mashing, decrease heat.
       if (movementVector != Vector2.zero && !heat.overheatMode)
         state.TransitionToState(State.DASHING);
     }
@@ -113,4 +118,5 @@ public class Player : MonoBehaviour
   }
 
   public int GetCurrentDashCost() => gameplayManager.dashHeatCost;
+  public void CoolOff() => heat.DecreaseHeat(3);
 }
