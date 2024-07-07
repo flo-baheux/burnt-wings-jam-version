@@ -5,7 +5,7 @@ public class HeatModificationZone : MonoBehaviour
 {
   [Range(-100, 100)]
   [SerializeField] private int heatModifier;
-  [SerializeField] private int ticksEveryS = 2;
+  [SerializeField] private float ticksEveryS = 2;
 
   private Player playerInZone = null;
 
@@ -25,7 +25,7 @@ public class HeatModificationZone : MonoBehaviour
 
   void Start()
   {
-    InvokeRepeating("DealDamageIfPlayerInZone", ticksEveryS, ticksEveryS);
+    InvokeRepeating("DealDamageIfPlayerInZone", 0, ticksEveryS);
   }
 
   public void DealDamageIfPlayerInZone()
