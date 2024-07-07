@@ -8,4 +8,31 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Resources/Scenes/Playground.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Resources/Scenes/REQUIRED/SceneManager.unity
+    guid: 5abb7f5717e076940ac8fee39e0b8d67
+  - enabled: 1
+    path: Assets/Resources/Scenes/REQUIRED/IngameHUD.unity
+    guid: 64f880f8ad13d2640a92a7a5353e511b
+  - enabled: 1
+    path: Assets/Resources/Scenes/REQUIRED/MainMenu.unity
+    guid: 6b704588b3c8c744998df2e63c08d2e4
+  - enabled: 1
+    path: Assets/Resources/Scenes/REQUIRED/IngameMenu.unity
+    guid: c1abffa0c8e5af34d9dac48d282f1dcc
+  - enabled: 1
+    path: Assets/Resources/Scenes/world_1_level_1.unity
+    guid: d2a2fe464dbe802458c8ec17f2971d93
+  - enabled: 1
+    path: Assets/Resources/Scenes/world_1_level_2.unity
+    guid: 932067cb7f7563944aa85e3faac21ee9
+  - enabled: 1
+    path: Assets/Resources/Scenes/world_1_level_3.unity
+    guid: 85b8e80e037d75841b2cf710f0446f97
+  - enabled: 1
+    path: Assets/Resources/Scenes/world_2_level_1.unity
+    guid: 554767740b7e46b4eb1b359ed6ccebf5
+  - enabled: 1
+    path: Assets/Resources/Scenes/world_2_level_2.unity
+    guid: bbf8b15fe3ac4af4482432adef79ddb3
   m_configObjects: {}

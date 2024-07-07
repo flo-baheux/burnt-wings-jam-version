@@ -378,7 +378,7 @@ MonoBehaviour:
   - worldId: 1
     nbLevels: 3
   - worldId: 2
-    nbLevels: 1
+    nbLevels: 2
 --- !u!4 &1485197712
 Transform:
   m_ObjectHideFlags: 0
