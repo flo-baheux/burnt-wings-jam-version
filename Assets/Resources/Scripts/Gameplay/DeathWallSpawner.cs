@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum DeathWallExpensionDirection
 {
@@ -41,7 +42,9 @@ public class DeathWallSpawner : MonoBehaviour
 
   void SpawnFireWall()
   {
-    Debug.Log(sortingOrder);
+    // FIXME: If spawning during async scene load, ends up in sceneManager and never get destroyed
+    if (SceneManager.GetActiveScene().name == "SceneManager")
+      return;
     Vector2 newPos = GetNewSpawnPosition();
     SpriteRenderer newWallSpriteRenderer = Instantiate(DeathWallPrefab, newPos, transform.rotation).GetComponent<SpriteRenderer>();
     newWallSpriteRenderer.sortingOrder = sortingOrder;

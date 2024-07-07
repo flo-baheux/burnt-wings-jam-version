@@ -5,7 +5,7 @@ public class PlayerDashingState : PlayerState
   private float dashTime = 0.15f;
   private float initialGravityScale = 0f;
   private float dashTimer = 0f;
-  private float enterGracePeriod = 0.20f;
+  private float enterGracePeriod = 0.2f;
   private bool isDashing = false, isGracePeriod = false;
 
   public PlayerDashingState(Player player) : base(player)

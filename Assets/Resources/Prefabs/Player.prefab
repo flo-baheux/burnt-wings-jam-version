@@ -177,8 +177,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpHeight: 4
-  fallSpeed: 15
-  runningSpeed: 20
+  fallSpeed: 12
+  runningSpeed: 17
   dashStrength: 40
   burnoutRunningSpeed: 20
   heatCooldownRate: 10

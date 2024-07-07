@@ -32,9 +32,10 @@ public class HeatModificationZone : MonoBehaviour
   {
     if (!playerInZone)
       return;
+
     if (heatModifier > 0)
       playerInZone.heat.IncreaseHeat(heatModifier);
-    else
+    else if (heatModifier < 0)
       playerInZone.heat.DecreaseHeat(heatModifier);
   }
 }
