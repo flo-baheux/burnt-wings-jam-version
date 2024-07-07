@@ -372,9 +372,11 @@ MonoBehaviour:
   playerPrefab: {fileID: 2371077000446278421, guid: fbbdc83ef4e7b0d459db4a61ff21201c, type: 3}
   player: {fileID: 0}
   dashHeatCost: 35
+  startingWorld: 1
+  startingLevel: 2
   worldLevels:
   - worldId: 1
-    nbLevels: 2
+    nbLevels: 3
   - worldId: 2
     nbLevels: 1
 --- !u!4 &1485197712

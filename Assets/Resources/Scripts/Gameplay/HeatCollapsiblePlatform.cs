@@ -9,7 +9,6 @@ enum TimerState
 }
 public class HeatCollapsiblePlatform : MonoBehaviour
 {
-
   [SerializeField] private float ActiveDuration = 2f;
   [SerializeField] private float CollapsedDuration = 5f;
   [SerializeField] private float FadeOutDuration = 1f;
@@ -20,6 +19,10 @@ public class HeatCollapsiblePlatform : MonoBehaviour
   private SpriteRenderer spriteRenderer;
   private Transform visual;
 
+  [SerializeField] private Sprite platform1;
+  [SerializeField] private Sprite platform2;
+  [SerializeField] private Sprite platform3;
+
   // Start is called before the first frame update
   private void Awake()
   {
@@ -29,6 +32,7 @@ public class HeatCollapsiblePlatform : MonoBehaviour
 
     visual = transform.GetChild(0);
     spriteRenderer = visual.gameObject.GetComponent<SpriteRenderer>();
+    spriteRenderer.sprite = platform1;
   }
 
   // Update is called once per frame
@@ -37,13 +41,14 @@ public class HeatCollapsiblePlatform : MonoBehaviour
     switch (state)
     {
       case TimerState.Active:
+        spriteRenderer.sprite = platform2;
         targetTime -= Time.deltaTime;
         visual.localPosition = new Vector2(Mathf.PingPong(Time.time * 10f, 1f), visual.localPosition.y);
         if (targetTime <= 0.0f)
         {
+          spriteRenderer.sprite = platform3;
           Collider.enabled = false;
           StartCoroutine(LerpTransparency(0, FadeOutDuration));
-
           targetTime = CollapsedDuration;
           state = TimerState.Collapsed;
         }
@@ -55,7 +60,9 @@ public class HeatCollapsiblePlatform : MonoBehaviour
         if (targetTime <= 0.0f)
         {
           StartCoroutine(LerpTransparency(1, FadeInDuration));
+
           targetTime = 0;
+          spriteRenderer.sprite = platform1;
           state = TimerState.Off;
           Collider.enabled = true;
         }

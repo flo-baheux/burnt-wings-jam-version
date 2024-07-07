@@ -23,14 +23,6 @@ public class StartScreen : MonoBehaviour
     gameObject.SetActive(false);
   }
 
-  // public void OnClickResume()
-  // {
-  //   GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-  //   if (!gameManager)
-  //     return;
-  //   gameManager.PauseResumeGame();
-  // }
-
   public void OnClickQuitGame()
   {
 #if UNITY_EDITOR

@@ -46,9 +46,7 @@ public class PlayerHeatComponent : MonoBehaviour
     HeatIncreased?.Invoke(currentHeat);
 
     if (!burnoutMode && currentHeat == maxHeat)
-    {
       StartCoroutine(Burnout());
-    }
   }
 
   // Decrease heat. However, also increase minHeat.
