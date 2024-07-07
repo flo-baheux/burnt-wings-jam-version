@@ -17,7 +17,7 @@ public class PlayerHeatComponent : MonoBehaviour
   public int overheatRecoveryThreshold = 80;
   public int overheatRecoveryThresholdDecreaseStep = 5;
   public int currentHeat = 0;
-  public float overheatTimeBeforeBurnout = 3f;
+  public float overheatTimeBeforeBurnout = 3;
   public bool overheatMode = false;
 
   private void Awake()
@@ -25,6 +25,17 @@ public class PlayerHeatComponent : MonoBehaviour
     currentHeat = minHeat;
     player = GetComponent<Player>();
     OverheatTriggered += () => Debug.Log("Overheat Triggered");
+  }
+
+  private void Update()
+  {
+    player.particleEmission.enabled = currentHeat != 0;
+    if (currentHeat < overheatRecoveryThreshold)
+      player.particleEmission.rateOverTime = 10;
+    else if (!overheatMode)
+      player.particleEmission.rateOverTime = 20;
+    else
+      player.particleEmission.rateOverTime = 50;
   }
 
   // Increase heat. However if the heat reaches max, start overheat mode.
@@ -59,9 +70,15 @@ public class PlayerHeatComponent : MonoBehaviour
 
   private IEnumerator Overheat()
   {
-    yield return new WaitForSeconds(overheatTimeBeforeBurnout);
-    if (overheatMode)
-      burnoutTriggered?.Invoke();
+    float timer = 0f;
+    while (timer < overheatTimeBeforeBurnout)
+    {
+      timer += Time.deltaTime;
+      if (!overheatMode)
+        yield break;
+      yield return null;
+    }
+    burnoutTriggered?.Invoke();
   }
 
   public bool IsBeyondHeatThreshold() => currentHeat > overheatRecoveryThreshold;

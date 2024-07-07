@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour
 
   public void Awake()
   {
+    Application.targetFrameRate = 60;
     sceneController = new SceneController();
     sceneController.LoadLevelSelection();
     foreach (WorldLevels wl in worldLevels)

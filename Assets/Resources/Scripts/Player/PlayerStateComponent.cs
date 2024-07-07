@@ -7,6 +7,7 @@ public class PlayerStateComponent : MonoBehaviour
   private Player Player;
 
   public PlayerGroundedState groundedState { get; private set; }
+  public PlayerHeatRecoveryState heatRecoveryState { get; private set; }
   public PlayerJumpingState jumpingState { get; private set; }
   public PlayerDashingState dashingState { get; private set; }
   public PlayerDeadState deadState { get; private set; }
@@ -19,12 +20,15 @@ public class PlayerStateComponent : MonoBehaviour
   {
     Player = GetComponent<Player>();
     groundedState = new PlayerGroundedState(Player);
+    heatRecoveryState = new PlayerHeatRecoveryState(Player);
     jumpingState = new PlayerJumpingState(Player);
     dashingState = new PlayerDashingState(Player);
     deadState = new PlayerDeadState(Player);
 
+
     states = new Dictionary<State, PlayerState>() {
       {State.GROUNDED, groundedState},
+      {State.HEAT_RECOVERY, heatRecoveryState},
       {State.JUMPING, jumpingState},
       {State.DASHING, dashingState},
       {State.DEAD, deadState},

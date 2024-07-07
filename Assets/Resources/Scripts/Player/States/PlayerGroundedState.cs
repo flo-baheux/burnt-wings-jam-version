@@ -20,8 +20,8 @@ public class PlayerGroundedState : PlayerState
       return State.JUMPING;
     }
 
-    if (Player.controlsEnabled && dashPressed)
-      Player.heat.DecreaseHeat(3);
+    if (Player.controlsEnabled && dashPressed && Player.movementVector == Vector2.zero && Player.heat.currentHeat > 0)
+      return State.HEAT_RECOVERY;
 
     if (!Player.IsGrounded())
       return State.JUMPING;
