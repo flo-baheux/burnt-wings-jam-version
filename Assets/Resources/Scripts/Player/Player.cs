@@ -14,7 +14,7 @@ public class Player : MonoBehaviour
   [SerializeField] private float dashStrength = 40f;
   public float DashStrength => dashStrength;
 
-  public float overheatRunningSpeed = 20f;
+  public float burnoutRunningSpeed = 20f;
   public float heatCooldownRate = 10f;
   [SerializeField] public GameObject coolOffParticles;
 
@@ -54,7 +54,7 @@ public class Player : MonoBehaviour
 
   void Start()
   {
-    heat.burnoutTriggered += () => state.TransitionToState(State.DEAD);
+    heat.BurnoutOver += () => state.TransitionToState(State.DEAD);
   }
 
   void Update()
@@ -80,7 +80,7 @@ public class Player : MonoBehaviour
 
     if (playerInput.actions["dash"].WasPressedThisFrame())
     {
-      if (movementVector != Vector2.zero && !heat.overheatMode)
+      if (movementVector != Vector2.zero && !heat.burnoutMode)
         state.TransitionToState(State.DASHING);
     }
   }
@@ -89,7 +89,7 @@ public class Player : MonoBehaviour
   {
     if (controlsEnabled)
     {
-      float horizontalVelocity = movementVector.x * (heat.overheatMode ? overheatRunningSpeed : runningSpeed);
+      float horizontalVelocity = movementVector.x * (heat.burnoutMode ? burnoutRunningSpeed : runningSpeed);
       rigidBody.velocity = new Vector2(horizontalVelocity, rigidBody.velocity.y);
     }
   }
