@@ -11,34 +11,16 @@ public class SceneController
     SetIsLoadingFalseCallback = (AsyncOperation _) => IsLoading = false;
 
 
-  public void LoadLevelSelection(bool setActive = true, Action<AsyncOperation> callback = null)
-  {
-    if (IsLoading) return;
-    IsLoading = true;
-    AsyncOperation asyncOp = SceneManager.LoadSceneAsync("LevelSelection", LoadSceneMode.Additive);
-    asyncOp.completed += callback;
-    asyncOp.completed += SetIsLoadingFalseCallback;
-    asyncOp.completed +=
-      (AsyncOperation asyncOp) =>
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName("LevelSelection"));
-  }
-
-  public void LoadMainMenu(Action<AsyncOperation> callback = null)
+  public void LoadMainMenu(bool setActive = true, Action<AsyncOperation> callback = null)
   {
     if (IsLoading) return;
     IsLoading = true;
     AsyncOperation asyncOp = SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
     asyncOp.completed += callback;
     asyncOp.completed += SetIsLoadingFalseCallback;
-  }
-
-  public void UnloadMainMenu(Action<AsyncOperation> callback = null)
-  {
-    if (IsLoading) return;
-    IsLoading = true;
-    AsyncOperation asyncOp = SceneManager.UnloadSceneAsync("MainMenu");
-    asyncOp.completed += callback;
-    asyncOp.completed += SetIsLoadingFalseCallback;
+    asyncOp.completed +=
+      (AsyncOperation asyncOp) =>
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName("MainMenu"));
   }
 
   public void LoadGameScene(string sceneName, Action<AsyncOperation> callback = null)
@@ -52,7 +34,7 @@ public class SceneController
     {
 
       string activeScene = SceneManager.GetActiveScene().name;
-      if (activeScene != "MainMenu" && activeScene != "SceneManager")
+      if (activeScene != "SceneManager")
         SceneManager.UnloadSceneAsync(activeScene);
       SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
       SceneManager.LoadScene("IngameHUD", LoadSceneMode.Additive);

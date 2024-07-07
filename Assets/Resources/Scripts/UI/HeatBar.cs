@@ -10,6 +10,7 @@ public class HeatBar : MonoBehaviour
   [SerializeField] private Slider slider;
   [SerializeField] private GameObject burnoutText;
   [SerializeField] private GameObject burnoutTimer;
+  [SerializeField] private RectTransform SliderThresholdRect;
   [SerializeField] private float heatbarLerpTime = 0.2f;
 
   private IEnumerator lerpHeatbarCoroutine;
@@ -34,9 +35,9 @@ public class HeatBar : MonoBehaviour
     player.state.deadState.OnEnter += HandlePlayerDeath;
     player.heat.HeatIncreased += HandleHeatChange;
     player.heat.HeatDecreased += HandleHeatChange;
-    player.heat.OverheatTriggered += HandleOverheat;
-    player.heat.burnoutTriggered += HandleBurnout;
+    player.heat.BurnoutTriggered += HandleBurnout;
     slider.value = 0;
+    SliderThresholdRect.anchoredPosition = new Vector2(GetThresholdXPosWithValue(), SliderThresholdRect.anchoredPosition.y);
     burnoutText.SetActive(false);
     burnoutTimer.SetActive(false);
   }
@@ -46,8 +47,7 @@ public class HeatBar : MonoBehaviour
     player.state.deadState.OnEnter -= HandlePlayerDeath;
     player.heat.HeatIncreased -= HandleHeatChange;
     player.heat.HeatDecreased -= HandleHeatChange;
-    player.heat.OverheatTriggered -= HandleOverheat;
-    player.heat.burnoutTriggered -= HandleBurnout;
+    player.heat.BurnoutTriggered -= HandleBurnout;
   }
 
   void HandleHeatChange(int currentHeat)
@@ -56,16 +56,13 @@ public class HeatBar : MonoBehaviour
       StopCoroutine(lerpHeatbarCoroutine);
     lerpHeatbarCoroutine = LerpHeatbar(currentHeat);
     StartCoroutine(lerpHeatbarCoroutine);
-  }
+    SliderThresholdRect.anchoredPosition = new Vector2(GetThresholdXPosWithValue(), SliderThresholdRect.anchoredPosition.y);
 
-  void HandleOverheat()
-  {
-    StartCoroutine(BurnoutDisplay());
   }
 
   void HandleBurnout()
   {
-
+    StartCoroutine(BurnoutDisplay());
   }
 
   IEnumerator LerpHeatbar(int newValue)
@@ -84,12 +81,12 @@ public class HeatBar : MonoBehaviour
   {
     burnoutText.SetActive(true);
     burnoutTimer.SetActive(true);
-    float timer = player.heat.overheatTimeBeforeBurnout;
+    float timer = player.heat.burnoutTimeUntilOver;
     TextMeshProUGUI timerText = burnoutTimer.GetComponent<TextMeshProUGUI>();
     while (timer >= 0f)
     {
       timerText.text = Mathf.RoundToInt(timer).ToString();
-      if (!player || !player.heat.overheatMode)
+      if (!player || !player.heat.burnoutMode)
       {
         burnoutText.SetActive(false);
         burnoutTimer.SetActive(false);
@@ -98,5 +95,10 @@ public class HeatBar : MonoBehaviour
       timer -= Time.deltaTime;
       yield return null;
     }
+  }
+
+  private float GetThresholdXPosWithValue()
+  {
+    return slider.GetComponent<RectTransform>().rect.width * player.heat.burnoutRecoveryThreshold / player.heat.maxHeat;
   }
 }

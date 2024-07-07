@@ -19,8 +19,8 @@ public class GameManager : MonoBehaviour
   [SerializeField] private GameObject playerPrefab;
   public Player player;
   public int dashHeatCost = 35;
-
-  // GAMEPLAY
+  public int startingWorld = 0;
+  public int startingLevel = 0;
 
   // WORLDS & LEVELS
   [SerializeField] List<WorldLevels> worldLevels;
@@ -41,10 +41,18 @@ public class GameManager : MonoBehaviour
   public void Awake()
   {
     Application.targetFrameRate = 60;
+
+    audioController = GetComponent<MainAudioController>();
     sceneController = new SceneController();
-    sceneController.LoadLevelSelection();
+
     foreach (WorldLevels wl in worldLevels)
       nbLevelsPerWorld[wl.worldId] = wl.nbLevels;
+  }
+
+  public void Start()
+  {
+    sceneController.LoadMainMenu();
+    audioController.PlayMenuBGM();
   }
 
   private void SetupForLevel()
@@ -59,17 +67,8 @@ public class GameManager : MonoBehaviour
 
   public void StartGame()
   {
-    // sceneController.LoadGameFromMainMenu(sceneToLoad, (AsyncOperation asyncOperation) =>
-    // {
-    //   audioController.PlayFirstBGM();
-
-    //   // SPAWN PLAYER 1
-
-
-    //   // Player.OnCheckpointActivated += HandleCheckpointActivated;
-
-    //   // SpawnPlayerInScene(sceneToLoad);
-    // });
+    audioController.PlayGameBGM();
+    StartLevel(startingWorld == 0 ? 1 : startingWorld, startingLevel == 0 ? 1 : startingLevel);
   }
 
   void HandlePlayerDeath(Player player)

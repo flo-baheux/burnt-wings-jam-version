@@ -4,40 +4,35 @@ using UnityEngine;
 
 public class MainAudioController : MonoBehaviour
 {
-  [SerializeField] private AudioClip FirstBGM;
-  [SerializeField] private AudioClip defaultAmbiantSounds;
-
-  [SerializeField, Range(0, 1)] float maxBGMvolume;
-  [SerializeField, Range(0, 1)] float maxSFXvolume;
+  [SerializeField] private AudioClip MenuBGM;
+  [SerializeField] private AudioClip GameBGM;
 
   [NonSerialized] public AudioSource BGMSource;
-  [NonSerialized] public AudioSource SFXSource;
 
   public void Awake()
   {
-    AudioSource[] sources = GetComponents<AudioSource>();
-    foreach (AudioSource source in sources)
+    BGMSource = GetComponent<AudioSource>();
+  }
+
+  public void PlayMenuBGM()
+  {
+    if (BGMSource.isPlaying)
+      StartCoroutine(FadeOutFadeIn(BGMSource, MenuBGM));
+    else
     {
-      if (source.outputAudioMixerGroup.name == "BGM")
-        BGMSource = source;
-      else if (source.outputAudioMixerGroup.name == "SFX")
-        SFXSource = source;
+      BGMSource.clip = MenuBGM;
+      BGMSource.Play();
+      StartCoroutine(FadeIn(BGMSource));
     }
   }
 
-  public void PlayDefaultAmbiantSounds()
-  {
-    SFXSource.clip = defaultAmbiantSounds;
-    SFXSource.Play();
-  }
-
-  public void PlayFirstBGM()
+  public void PlayGameBGM()
   {
     if (BGMSource.isPlaying)
-      StartCoroutine(FadeOutFadeIn(BGMSource, FirstBGM));
+      StartCoroutine(FadeOutFadeIn(BGMSource, GameBGM));
     else
     {
-      BGMSource.clip = FirstBGM;
+      BGMSource.clip = GameBGM;
       BGMSource.Play();
       StartCoroutine(FadeIn(BGMSource));
     }
