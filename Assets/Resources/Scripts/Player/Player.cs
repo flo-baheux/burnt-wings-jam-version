@@ -20,7 +20,8 @@ public class Player : MonoBehaviour
 
 
   public Vector2 movementVector = Vector2.zero;
-
+  public float coyoteTime = 0.1f;
+  public bool wasRecentlyGrounded = true;
   private bool facingRight = true;
   public bool controlsEnabled = true;
 
@@ -80,7 +81,7 @@ public class Player : MonoBehaviour
 
     if (playerInput.actions["dash"].WasPressedThisFrame())
     {
-      if (movementVector != Vector2.zero && !heat.burnoutMode)
+      if (movementVector.magnitude >= 0.1f && !heat.burnoutMode)
         state.TransitionToState(State.DASHING);
     }
   }
@@ -96,10 +97,12 @@ public class Player : MonoBehaviour
 
   public bool IsGrounded()
   {
+    if (wasRecentlyGrounded) return true;
     Vector2 center = new(mainCollider.bounds.center.x, mainCollider.bounds.min.y);
     Vector2 size = new(mainCollider.bounds.size.x, 0.05f);
     RaycastHit2D raycastHit = Physics2D.BoxCast(center, size, 0f, Vector2.down, 0f, LayerMask.GetMask("Ground"));
     return raycastHit.collider;
+
   }
 
   public void RespawnToPosition(Vector2 position)

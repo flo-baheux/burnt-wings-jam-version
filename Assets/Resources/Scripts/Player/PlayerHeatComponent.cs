@@ -25,7 +25,6 @@ public class PlayerHeatComponent : MonoBehaviour
   {
     currentHeat = minHeat;
     player = GetComponent<Player>();
-    BurnoutTriggered += () => Debug.Log("Burnout Triggered");
   }
 
   private void Update()

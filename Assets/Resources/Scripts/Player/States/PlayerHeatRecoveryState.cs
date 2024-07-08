@@ -19,7 +19,7 @@ public class PlayerHeatRecoveryState : PlayerGroundedState
   {
     bool dashReleased = Player.playerInput.actions["Dash"].WasReleasedThisFrame();
 
-    if (!Player.controlsEnabled || dashReleased || Player.movementVector != Vector2.zero)
+    if (!Player.controlsEnabled || dashReleased || Player.movementVector.magnitude > 0.1f)
       return State.GROUNDED;
 
     if (!coolingOff)
