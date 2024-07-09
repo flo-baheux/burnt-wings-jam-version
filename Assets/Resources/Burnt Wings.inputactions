@@ -210,6 +210,17 @@
                 },
                 {
                     "name": "",
+                    "id": "14fc04ab-53ad-4019-bb61-e3721962eba9",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard;Gamepad",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "f8aa3470-3f0c-4f05-bb82-1088eeee1cd3",
                     "path": "<Gamepad>/leftShoulder",
                     "interactions": "",
