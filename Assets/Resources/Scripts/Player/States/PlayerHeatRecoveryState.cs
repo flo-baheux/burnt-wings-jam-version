@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class PlayerHeatRecoveryState : PlayerGroundedState
 {
   private bool coolingOff = false;
@@ -11,15 +9,12 @@ public class PlayerHeatRecoveryState : PlayerGroundedState
   public override void Enter()
   {
     coolingOff = false;
-    Player.coolOffParticles.SetActive(true);
     base.Enter();
   }
 
   public override State? CustomUpdate()
   {
-    bool dashReleased = Player.playerInput.actions["Dash"].WasReleasedThisFrame();
-
-    if (!Player.controlsEnabled || dashReleased || Player.movementVector.magnitude > 0.1f)
+    if (Player.input.DashReleased() || Player.input.movementVector.magnitude > 0.1f)
       return State.GROUNDED;
 
     if (!coolingOff)
@@ -33,7 +28,6 @@ public class PlayerHeatRecoveryState : PlayerGroundedState
   public override void Exit()
   {
     Player.CancelInvoke("CoolOff");
-    Player.coolOffParticles.SetActive(false);
     base.Exit();
   }
 }

@@ -55,53 +55,16 @@ public class GameManager : MonoBehaviour
     audioController.PlayMenuBGM();
   }
 
-  private void SetupForLevel()
-  {
-    GameObject spawnPoint = GameObject.FindGameObjectWithTag("Spawn");
-    player = Instantiate(playerPrefab, spawnPoint.transform.position, spawnPoint.transform.rotation).GetComponent<Player>();
-    PlayerSpawned?.Invoke(player);
-    vcam.Follow = player.transform;
-    vcam.LookAt = player.transform;
-    player.state.deadState.OnEnter += HandlePlayerDeath;
-  }
-
   public void StartGame()
   {
     audioController.PlayGameBGM();
     StartLevel(startingWorld == 0 ? 1 : startingWorld, startingLevel == 0 ? 1 : startingLevel);
   }
 
-  void HandlePlayerDeath(Player player)
-  {
-    player.state.deadState.OnEnter -= HandlePlayerDeath;
-    Destroy(player.gameObject);
-    sceneController.ReloadCurrentScene((AsyncOperation sceneLoad) => SetupForLevel());
-  }
-
-  public void PauseResumeGame()
-  {
-    if (!gamePaused)
-    {
-      Time.timeScale = 0;
-      player.controlsEnabled = false;
-      sceneController.LoadPauseScene();
-    }
-    else
-    {
-      sceneController.UnloadPauseScene((AsyncOperation _) =>
-      {
-        Time.timeScale = 1;
-        player.controlsEnabled = true;
-      });
-    }
-    gamePaused = !gamePaused;
-  }
-
   public void StartLevel(int world, int level)
   {
     currentWorld = world;
     currentLevel = level;
-    Debug.Log("STARTING LEVEL " + currentWorld + "-" + currentLevel);
     sceneController.LoadGameScene($"world_{world}_level_{level}", (AsyncOperation sceneLoad) => SetupForLevel());
   }
 
@@ -117,5 +80,48 @@ public class GameManager : MonoBehaviour
     }
     else
       StartLevel(currentWorld, currentLevel + 1);
+  }
+
+  private void SetupForLevel()
+  {
+    GameObject spawnPoint = GameObject.FindGameObjectWithTag("Spawn");
+    player = Instantiate(playerPrefab, spawnPoint.transform.position, spawnPoint.transform.rotation).GetComponent<Player>();
+    PlayerSpawned?.Invoke(player);
+    vcam.Follow = player.transform;
+    vcam.LookAt = player.transform;
+    player.state.deadState.OnEnter += HandlePlayerDeath;
+  }
+
+
+  void HandlePlayerDeath(Player player)
+  {
+    player.state.deadState.OnEnter -= HandlePlayerDeath;
+    Destroy(player.gameObject);
+    sceneController.ReloadCurrentScene((AsyncOperation sceneLoad) => SetupForLevel());
+  }
+
+  public void PauseResumeGame()
+  {
+    if (!gamePaused)
+    {
+      Time.timeScale = 0;
+      player.input.controlsEnabled = false;
+      sceneController.LoadPauseScene();
+    }
+    else
+    {
+      sceneController.UnloadPauseScene((AsyncOperation _) =>
+      {
+        Time.timeScale = 1;
+        player.input.controlsEnabled = true;
+      });
+    }
+    gamePaused = !gamePaused;
+  }
+
+  private void Update()
+  {
+    if (player && player.input.actions["Pause"].WasPressedThisFrame())
+      PauseResumeGame();
   }
 }

@@ -53,8 +53,11 @@ public class PlayerStateComponent : MonoBehaviour
 
   public void TransitionToState(State newState)
   {
-    if (currentState.state == newState && newState != State.DASHING)
-      return;
+    if (currentState.state == newState)
+    {
+      if (newState != State.DASHING || !dashingState.canDash)
+        return;
+    }
     currentState.Exit();
     currentState = states[newState];
     currentState.Enter();

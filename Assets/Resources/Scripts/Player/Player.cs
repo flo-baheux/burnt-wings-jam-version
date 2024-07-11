@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
@@ -16,24 +15,13 @@ public class Player : MonoBehaviour
 
   public float burnoutRunningSpeed = 20f;
   public float heatCooldownRate = 10f;
-  [SerializeField] public GameObject coolOffParticles;
-
-
-  public Vector2 movementVector = Vector2.zero;
-  public float coyoteTime = 0.1f;
-  public bool wasRecentlyGrounded = true;
-  private bool facingRight = true;
-  public bool controlsEnabled = true;
 
   // Components
   [NonSerialized] public Rigidbody2D rigidBody;
-  [NonSerialized] public PlayerInput playerInput;
   public PlayerStateComponent state { get; private set; }
   public PlayerHeatComponent heat { get; private set; }
+  public PlayerInputComponent input { get; private set; }
   private CapsuleCollider2D mainCollider;
-  public Animator animator;
-  private SpriteRenderer spriteRenderer;
-  public ParticleSystem.EmissionModule particleEmission;
 
   // Gameplay Manager
   private GameManager gameplayManager;
@@ -42,15 +30,10 @@ public class Player : MonoBehaviour
   {
     state = GetComponent<PlayerStateComponent>();
     heat = GetComponent<PlayerHeatComponent>();
+    input = GetComponent<PlayerInputComponent>();
     rigidBody = GetComponent<Rigidbody2D>();
     mainCollider = GetComponent<CapsuleCollider2D>();
-    playerInput = GetComponent<PlayerInput>();
-    animator = GetComponent<Animator>();
-    spriteRenderer = GetComponent<SpriteRenderer>();
-    particleEmission = GetComponent<ParticleSystem>().emission;
     gameplayManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-    coolOffParticles.SetActive(false);
-    animator.keepAnimatorStateOnDisable = false;
   }
 
   void Start()
@@ -60,56 +43,33 @@ public class Player : MonoBehaviour
 
   void Update()
   {
-
-    if (controlsEnabled)
-    {
-      movementVector = playerInput.actions["Move"].ReadValue<Vector2>();
-      if (movementVector.x > 0)
-        facingRight = true;
-      else if (movementVector.x < 0)
-        facingRight = false;
-    }
-
-    spriteRenderer.flipX = !facingRight;
-    animator.SetFloat("xAbsInput", Math.Abs(movementVector.x));
-    animator.SetFloat("yVelocity", rigidBody.velocity.y);
-    animator.SetBool("IsGrounded", state.currentState.state == State.GROUNDED);
-    animator.SetBool("IsCoolingOff", state.currentState.state == State.HEAT_RECOVERY);
-    animator.SetBool("Overheat", heat.IsBeyondHeatThreshold());
-    if (playerInput.actions["Pause"].WasPressedThisFrame())
-      gameplayManager.PauseResumeGame();
-
-    if (playerInput.actions["dash"].WasPressedThisFrame())
-    {
-      if (movementVector.magnitude >= 0.1f && !heat.burnoutMode)
-        state.TransitionToState(State.DASHING);
-    }
+    if (input.dashPressed && input.movementVector.magnitude >= 0.1f && !heat.burnoutMode)
+      state.TransitionToState(State.DASHING);
   }
 
   void FixedUpdate()
   {
-    if (controlsEnabled)
+    if (input.controlsEnabled)
     {
-      float horizontalVelocity = movementVector.x * (heat.burnoutMode ? burnoutRunningSpeed : runningSpeed);
+      float horizontalVelocity = input.movementVector.x * (heat.burnoutMode ? burnoutRunningSpeed : runningSpeed);
       rigidBody.velocity = new Vector2(horizontalVelocity, rigidBody.velocity.y);
     }
   }
 
   public bool IsGrounded()
   {
-    if (wasRecentlyGrounded) return true;
+    if (state.groundedState.wasRecentlyGrounded) return true;
     Vector2 center = new(mainCollider.bounds.center.x, mainCollider.bounds.min.y);
     Vector2 size = new(mainCollider.bounds.size.x, 0.05f);
     RaycastHit2D raycastHit = Physics2D.BoxCast(center, size, 0f, Vector2.down, 0f, LayerMask.GetMask("Ground"));
     return raycastHit.collider;
-
   }
 
   public void RespawnToPosition(Vector2 position)
   {
     rigidBody.position = position;
     state.TransitionToState(State.JUMPING);
-    controlsEnabled = true;
+    input.controlsEnabled = true;
   }
 
   public void OnTriggerEnter2D(Collider2D other)

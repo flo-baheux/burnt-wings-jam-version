@@ -5,8 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(Player))]
 public class PlayerHeatComponent : MonoBehaviour
 {
-  private Player player;
-
   public Action<int> HeatIncreased;
   public Action<int> HeatDecreased;
   public Action BurnoutCancelled;
@@ -24,18 +22,10 @@ public class PlayerHeatComponent : MonoBehaviour
   private void Awake()
   {
     currentHeat = minHeat;
-    player = GetComponent<Player>();
   }
 
   private void Update()
   {
-    player.particleEmission.enabled = currentHeat != 0;
-    if (currentHeat < burnoutRecoveryThreshold)
-      player.particleEmission.rateOverTime = 10;
-    else if (!burnoutMode)
-      player.particleEmission.rateOverTime = 20;
-    else
-      player.particleEmission.rateOverTime = 50;
   }
 
   // Increase heat. However if the heat reaches max, start burnout mode.

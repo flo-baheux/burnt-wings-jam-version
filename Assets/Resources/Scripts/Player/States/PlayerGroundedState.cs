@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class PlayerGroundedState : PlayerState
 {
+  private float coyoteTime = 0.1f;
+  public bool wasRecentlyGrounded = true;
+
   public PlayerGroundedState(Player player) : base(player)
   {
     this.state = State.GROUNDED;
@@ -10,10 +13,7 @@ public class PlayerGroundedState : PlayerState
 
   public override State? CustomUpdate()
   {
-    bool jumpPressed = Player.playerInput.actions["Jump"].WasPressedThisFrame();
-    bool dashPressed = Player.playerInput.actions["Dash"].WasPressedThisFrame();
-
-    if (Player.controlsEnabled && jumpPressed)
+    if (Player.input.JumpPressed())
     {
       float jumpForce = Mathf.Sqrt(Player.JumpHeight * -2 * (Physics2D.gravity.y * Player.rigidBody.gravityScale));
       // Using AddForce (applying force once) is fine in update method - don't move it out
@@ -22,7 +22,7 @@ public class PlayerGroundedState : PlayerState
       return State.JUMPING;
     }
 
-    if (Player.controlsEnabled && dashPressed && Player.movementVector.magnitude <= 0.1f)
+    if (Player.input.DashHeld() && Player.input.movementVector.magnitude <= 0.1f)
       return State.HEAT_RECOVERY;
 
     if (!Player.IsGrounded())
@@ -39,8 +39,8 @@ public class PlayerGroundedState : PlayerState
 
   public IEnumerator ActivateCoyoteTime()
   {
-    Player.wasRecentlyGrounded = true;
-    yield return new WaitForSeconds(Player.coyoteTime);
-    Player.wasRecentlyGrounded = false;
+    wasRecentlyGrounded = true;
+    yield return new WaitForSeconds(coyoteTime);
+    wasRecentlyGrounded = false;
   }
 }

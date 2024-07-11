@@ -8,7 +8,7 @@ public class PlayerDeadState : PlayerState
   public override State? CustomUpdate()
   {
     // One cannot escape death by itself!
-    Player.controlsEnabled = false;
+    Player.input.controlsEnabled = false;
     return null;
   }
 }

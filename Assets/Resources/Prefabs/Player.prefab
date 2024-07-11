@@ -81,6 +81,8 @@ GameObject:
   - component: {fileID: 1658019344587354579}
   - component: {fileID: 8117689668685258042}
   - component: {fileID: 5845939863363887564}
+  - component: {fileID: 5549292331989888080}
+  - component: {fileID: 383993415057007221}
   - component: {fileID: 237211486974768608}
   - component: {fileID: 2986606586412556150}
   - component: {fileID: 1515380072639808174}
@@ -182,10 +184,6 @@ MonoBehaviour:
   dashStrength: 40
   burnoutRunningSpeed: 20
   heatCooldownRate: 10
-  coolOffParticles: {fileID: 6528193356781854805}
-  movementVector: {x: 0, y: 0}
-  controlsEnabled: 1
-  animator: {fileID: 0}
 --- !u!114 &1658019344587354579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242,6 +240,39 @@ MonoBehaviour:
   - {fileID: 8300000, guid: ae1f2283858bfdb4a9d445afd7a70848, type: 3}
   - {fileID: 8300000, guid: 5e5cfd9c464d413469232e162770887a, type: 3}
   - {fileID: 8300000, guid: 99fa6ef3b40cb8b458d98e5684a93987, type: 3}
+--- !u!114 &5549292331989888080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2371077000446278421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c9386bc68965a94db0abaf0f885b2b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coolOffParticles: {fileID: 6528193356781854805}
+--- !u!114 &383993415057007221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2371077000446278421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 994e89e072506a04aa33c8302e46a3cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementVector: {x: 0, y: 0}
+  controlsEnabled: 1
+  dashPressed: 0
+  dashHeld: 0
+  dashReleased: 0
+  jumpPressed: 0
+  jumpHeld: 0
+  jumpReleased: 0
 --- !u!50 &237211486974768608
 Rigidbody2D:
   serializedVersion: 4
@@ -330,7 +361,19 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 383993415057007221}
+        m_TargetAssemblyTypeName: PlayerInputComponent, Assembly-CSharp
+        m_MethodName: HandleMovement
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 12fed377-8273-4319-9709-b43a324548d7
     m_ActionName: Player/Move[/XInputControllerWindows/leftStick,/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
   - m_PersistentCalls:

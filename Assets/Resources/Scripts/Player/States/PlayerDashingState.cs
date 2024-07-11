@@ -1,13 +1,15 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerDashingState : PlayerState
 {
   private float dashTime = 0.15f;
-  private float initialGravityScale = 0f;
-  private float dashTimer = 0f;
   private float enterGracePeriod = 0.2f;
   private float exitGracePeriod = 0.2f;
-  private bool isDashing = false, isGracePeriod = false;
+  private bool isDashing = false;
+  public bool canDash = false;
+  float initialGravityScale = 0f;
+  public Coroutine dashCoroutine = null;
 
   public PlayerDashingState(Player player) : base(player)
   {
@@ -16,69 +18,60 @@ public class PlayerDashingState : PlayerState
 
   public override void Enter()
   {
-    base.Enter();
-
-    dashTimer = 0f;
+    canDash = false;
     isDashing = true;
-    isGracePeriod = true;
-    Player.animator.SetTrigger("Dash");
-    Player.heat.IncreaseHeat(Player.GetCurrentDashCost());
     initialGravityScale = Player.rigidBody.gravityScale;
-    Player.rigidBody.gravityScale = 0f;
-    Player.controlsEnabled = false;
-    Player.rigidBody.velocity *= 0.1f;
-
+    dashCoroutine = Player.StartCoroutine(Dash());
+    base.Enter();
   }
 
-
-  // FIXME: That would be a lot easier with a coroutine...
   public override State? CustomUpdate()
   {
-    // collision = early stop?
-    if (isGracePeriod && dashTimer <= enterGracePeriod)
-    {
-      dashTimer += Time.deltaTime;
-      return base.CustomUpdate();
-    }
+    if (!isDashing)
+      return Player.IsGrounded() ? State.GROUNDED : State.JUMPING;
 
-    if (isGracePeriod)
-    {
-      isGracePeriod = false;
-      dashTimer = 0f;
-      Player.rigidBody.velocity = Player.movementVector * Player.DashStrength;
-    }
-
-    if (isDashing && dashTimer <= dashTime)
-    {
-      dashTimer += Time.deltaTime;
-      return base.CustomUpdate();
-    }
-
-    if (isDashing)
-    {
-      isDashing = false;
-      dashTimer = 0f;
-      isGracePeriod = true;
-      Player.controlsEnabled = true;
-      Player.rigidBody.velocity *= 0.1f;
-    }
-
-    if (isGracePeriod && dashTimer <= exitGracePeriod)
-    {
-      dashTimer += Time.deltaTime;
-      return base.CustomUpdate();
-    }
-
-    return Player.IsGrounded() ? State.GROUNDED : State.JUMPING;
+    return base.CustomUpdate();
   }
 
   public override void Exit()
   {
+    Player.StopCoroutine(dashCoroutine);
+    canDash = true;
+    isDashing = false;
+    Player.input.controlsEnabled = true;
+    Player.rigidBody.gravityScale = initialGravityScale;
     base.Exit();
+  }
+
+  private IEnumerator Dash()
+  {
+    Player.heat.IncreaseHeat(Player.GetCurrentDashCost());
+    Player.input.controlsEnabled = false;
+
+    Player.rigidBody.gravityScale = 0f;
+    Player.rigidBody.velocity *= 0.1f;
+
+    Vector2 dashDirection = Player.input.movementVector.normalized;
+
+    float timer = 0f;
+    while (timer <= enterGracePeriod)
+    {
+      if (Player.input.movementVector.magnitude > 0.1f)
+        dashDirection = Player.input.movementVector.normalized;
+      timer += Time.deltaTime;
+      yield return null;
+    }
+
+    Player.rigidBody.velocity = dashDirection * Player.DashStrength;
+    yield return new WaitForSeconds(dashTime);
+
+    Player.rigidBody.velocity *= 0.1f;
+    Player.input.controlsEnabled = true;
+
+    canDash = true;
+    yield return new WaitForSeconds(exitGracePeriod);
 
     Player.rigidBody.velocity = Vector2.zero;
-    Player.controlsEnabled = true;
-    Player.rigidBody.gravityScale = initialGravityScale;
-    Player.animator.ResetTrigger("Dash");
+    isDashing = false;
   }
 }
