@@ -1,6 +1,10 @@
-public class PlayerHeatRecoveryState : PlayerGroundedState
+using System.Collections;
+using UnityEngine;
+
+public class PlayerHeatRecoveryState : PlayerStandingState
 {
-  private bool coolingOff = false;
+  private Coroutine heatRecoveryCoroutine;
+
   public PlayerHeatRecoveryState(Player player) : base(player)
   {
     this.state = State.HEAT_RECOVERY;
@@ -8,26 +12,31 @@ public class PlayerHeatRecoveryState : PlayerGroundedState
 
   public override void Enter()
   {
-    coolingOff = false;
+    heatRecoveryCoroutine = Player.StartCoroutine(HeatRecovery());
     base.Enter();
   }
 
   public override State? CustomUpdate()
   {
-    if (Player.input.DashReleased() || Player.input.movementVector.magnitude > 0.1f)
-      return State.GROUNDED;
+    if (Player.input.DashReleased || Player.input.movementVector.magnitude > 0.1f)
+      return State.STANDING;
 
-    if (!coolingOff)
-    {
-      coolingOff = true;
-      Player.InvokeRepeating("CoolOff", 0, 1 / Player.heatCooldownRate);
-    }
     return base.CustomUpdate();
   }
 
   public override void Exit()
   {
-    Player.CancelInvoke("CoolOff");
+    Player.StopCoroutine(heatRecoveryCoroutine);
     base.Exit();
+  }
+
+  public IEnumerator HeatRecovery()
+  {
+    yield return new WaitForSeconds(Player.heat.heatRecoveryDelay);
+    while (true)
+    {
+      Player.heat.DecreaseHeat(Player.heat.heatRecoveryPerSec / 10);
+      yield return new WaitForSeconds(0.1f);
+    }
   }
 }

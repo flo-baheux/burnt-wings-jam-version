@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-  // Movements
+  [Header("Movements")]
   [SerializeField] private float jumpHeight = 4f;
   public float JumpHeight => jumpHeight;
   [SerializeField] private float fallSpeed = 8f;
@@ -13,15 +13,18 @@ public class Player : MonoBehaviour
   [SerializeField] private float dashStrength = 40f;
   public float DashStrength => dashStrength;
 
+  public float coyoteTime = 0.1f;
+
+  [Header("Burnout")]
   public float burnoutRunningSpeed = 20f;
-  public float heatCooldownRate = 10f;
 
   // Components
   [NonSerialized] public Rigidbody2D rigidBody;
   public PlayerStateComponent state { get; private set; }
   public PlayerHeatComponent heat { get; private set; }
   public PlayerInputComponent input { get; private set; }
-  private CapsuleCollider2D mainCollider;
+  private Collider2D mainCollider;
+
 
   // Gameplay Manager
   private GameManager gameplayManager;
@@ -32,7 +35,7 @@ public class Player : MonoBehaviour
     heat = GetComponent<PlayerHeatComponent>();
     input = GetComponent<PlayerInputComponent>();
     rigidBody = GetComponent<Rigidbody2D>();
-    mainCollider = GetComponent<CapsuleCollider2D>();
+    mainCollider = GetComponent<Collider2D>();
     gameplayManager = GameObject.Find("GameManager").GetComponent<GameManager>();
   }
 
@@ -43,7 +46,7 @@ public class Player : MonoBehaviour
 
   void Update()
   {
-    if (input.dashPressed && input.movementVector.magnitude >= 0.1f && !heat.burnoutMode)
+    if (input.DashPressed && input.movementVector.magnitude >= 0.1f && !heat.burnoutMode)
       state.TransitionToState(State.DASHING);
   }
 
@@ -58,9 +61,8 @@ public class Player : MonoBehaviour
 
   public bool IsGrounded()
   {
-    if (state.groundedState.wasRecentlyGrounded) return true;
     Vector2 center = new(mainCollider.bounds.center.x, mainCollider.bounds.min.y);
-    Vector2 size = new(mainCollider.bounds.size.x, 0.05f);
+    Vector2 size = new(mainCollider.bounds.size.x, 0.1f);
     RaycastHit2D raycastHit = Physics2D.BoxCast(center, size, 0f, Vector2.down, 0f, LayerMask.GetMask("Ground"));
     return raycastHit.collider;
   }
@@ -68,7 +70,7 @@ public class Player : MonoBehaviour
   public void RespawnToPosition(Vector2 position)
   {
     rigidBody.position = position;
-    state.TransitionToState(State.JUMPING);
+    state.TransitionToState(State.FALLING);
     input.controlsEnabled = true;
   }
 
@@ -81,5 +83,4 @@ public class Player : MonoBehaviour
   }
 
   public int GetCurrentDashCost() => gameplayManager.dashHeatCost;
-  public void CoolOff() => heat.DecreaseHeat(3);
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -5,7 +6,7 @@ public class PlayerDashingState : PlayerState
 {
   private float dashTime = 0.15f;
   private float enterGracePeriod = 0.2f;
-  private float exitGracePeriod = 0.2f;
+  private float exitGracePeriod = 0.1f;
   private bool isDashing = false;
   public bool canDash = false;
   float initialGravityScale = 0f;
@@ -15,6 +16,8 @@ public class PlayerDashingState : PlayerState
   {
     this.state = State.DASHING;
   }
+
+  public Action OnDashMovementStart;
 
   public override void Enter()
   {
@@ -28,7 +31,7 @@ public class PlayerDashingState : PlayerState
   public override State? CustomUpdate()
   {
     if (!isDashing)
-      return Player.IsGrounded() ? State.GROUNDED : State.JUMPING;
+      return Player.IsGrounded() ? State.STANDING : State.FALLING;
 
     return base.CustomUpdate();
   }
@@ -51,17 +54,18 @@ public class PlayerDashingState : PlayerState
     Player.rigidBody.gravityScale = 0f;
     Player.rigidBody.velocity *= 0.1f;
 
-    Vector2 dashDirection = Player.input.movementVector.normalized;
+    Vector2 dashDirection = GetDashDirection();
 
     float timer = 0f;
     while (timer <= enterGracePeriod)
     {
       if (Player.input.movementVector.magnitude > 0.1f)
-        dashDirection = Player.input.movementVector.normalized;
+        dashDirection = GetDashDirection();
       timer += Time.deltaTime;
       yield return null;
     }
 
+    OnDashMovementStart?.Invoke();
     Player.rigidBody.velocity = dashDirection * Player.DashStrength;
     yield return new WaitForSeconds(dashTime);
 
@@ -71,7 +75,10 @@ public class PlayerDashingState : PlayerState
     canDash = true;
     yield return new WaitForSeconds(exitGracePeriod);
 
-    Player.rigidBody.velocity = Vector2.zero;
+    // Player.rigidBody.velocity = Vector2.zero;
     isDashing = false;
   }
+
+  private Vector2 GetDashDirection()
+    => new(Mathf.RoundToInt(Player.input.movementVector.normalized.x), Mathf.RoundToInt(Player.input.movementVector.normalized.y));
 }

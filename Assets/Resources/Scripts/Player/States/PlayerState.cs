@@ -3,8 +3,9 @@ using System;
 public enum State
 {
   DEAD,
-  GROUNDED,
+  STANDING,
   JUMPING,
+  FALLING,
   DASHING,
   HEAT_RECOVERY
 };

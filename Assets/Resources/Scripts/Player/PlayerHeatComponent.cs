@@ -11,12 +11,13 @@ public class PlayerHeatComponent : MonoBehaviour
   public Action BurnoutTriggered;
   public Action BurnoutOver;
 
-  public int minHeat = 0;
-  public int maxHeat = 100;
-  public int burnoutRecoveryThreshold = 80;
+  public int minHeat = 0, currentHeat = 0, maxHeat = 100;
+  public int burnoutRecoveryThreshold = 70;
   public int burnoutRecoveryThresholdDecreaseStep = 5;
-  public int currentHeat = 0;
-  public float burnoutTimeUntilOver = 3;
+  public float burnoutTimeUntilOver = 5;
+  public int heatRecoveryPerSec = 40;
+  public float heatRecoveryDelay = 0.3f;
+
   public bool burnoutMode = false;
 
   private void Awake()
@@ -24,11 +25,6 @@ public class PlayerHeatComponent : MonoBehaviour
     currentHeat = minHeat;
   }
 
-  private void Update()
-  {
-  }
-
-  // Increase heat. However if the heat reaches max, start burnout mode.
   public void IncreaseHeat(int value)
   {
     currentHeat = Math.Clamp(currentHeat + value, minHeat, maxHeat);
@@ -38,7 +34,6 @@ public class PlayerHeatComponent : MonoBehaviour
       StartCoroutine(Burnout());
   }
 
-  // Decrease heat. However, also increase minHeat.
   public void DecreaseHeat(int value)
   {
     currentHeat = Math.Clamp(currentHeat - value, minHeat, maxHeat);

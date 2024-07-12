@@ -10,7 +10,6 @@ public class SceneController
   public SceneController() =>
     SetIsLoadingFalseCallback = (AsyncOperation _) => IsLoading = false;
 
-
   public void LoadMainMenu(bool setActive = true, Action<AsyncOperation> callback = null)
   {
     if (IsLoading) return;
