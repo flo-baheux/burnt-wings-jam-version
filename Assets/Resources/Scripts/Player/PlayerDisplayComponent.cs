@@ -5,16 +5,20 @@ using UnityEngine;
 [RequireComponent(typeof(Player))]
 public class PlayerDisplayComponent : MonoBehaviour
 {
-  [SerializeField] private ParticleSystem.EmissionModule particleEmission;
-  [SerializeField] private GameObject coolOffParticles;
+  [SerializeField] private ParticleSystem heatParticleSystem;
+  [SerializeField] private ParticleSystem coolOffParticleSystem;
+  [SerializeField] private ParticleSystem feathersParticleSystem;
+  [SerializeField] private TrailRenderer dashTrailRenderer;
   [SerializeField] private float dashScreenshakeStrength = 0.2f;
 
   private bool facingRight = true;
   private Animator animator;
   private SpriteRenderer spriteRenderer;
-  private CinemachineImpulseSource impulseSource;
+  private CinemachineImpulseSource cameraImpulseSource;
 
-  private TrailRenderer trailRenderer;
+  private ParticleSystem.EmissionModule heatParticleEmissionModule;
+  private ParticleSystem.EmissionModule coolOffParticleEmissionModule;
+  private ParticleSystem.EmissionModule feathersParticleEmissionModule;
 
   private Player Player;
 
@@ -23,10 +27,16 @@ public class PlayerDisplayComponent : MonoBehaviour
     Player = GetComponent<Player>();
     animator = GetComponent<Animator>();
     spriteRenderer = GetComponent<SpriteRenderer>();
-    impulseSource = GetComponent<CinemachineImpulseSource>();
-    particleEmission = GetComponent<ParticleSystem>().emission;
-    trailRenderer = GetComponentInChildren<TrailRenderer>();
-    coolOffParticles.SetActive(false);
+    cameraImpulseSource = GetComponent<CinemachineImpulseSource>();
+
+    heatParticleEmissionModule = heatParticleSystem.emission;
+    coolOffParticleEmissionModule = coolOffParticleSystem.emission;
+    feathersParticleEmissionModule = feathersParticleSystem.emission;
+
+    heatParticleEmissionModule.enabled = false;
+    coolOffParticleEmissionModule.enabled = false;
+    feathersParticleEmissionModule.enabled = false;
+    dashTrailRenderer.emitting = false;
   }
 
   private void Start()
@@ -38,7 +48,6 @@ public class PlayerDisplayComponent : MonoBehaviour
 
   void Update()
   {
-    trailRenderer.material.SetColor("EmissionColor", Player.input.JumpHeld ? Color.red : Color.white);
     if (Player.input.movementVector.x > 0)
       facingRight = true;
     else if (Player.input.movementVector.x < 0)
@@ -50,19 +59,31 @@ public class PlayerDisplayComponent : MonoBehaviour
     animator.SetBool("IsGrounded", Player.state.currentState.state == State.STANDING);
     animator.SetBool("IsCoolingOff", Player.state.currentState.state == State.HEAT_RECOVERY);
     animator.SetBool("Overheat", Player.heat.IsBeyondHeatThreshold());
-    coolOffParticles.SetActive(Player.state.currentState.state == State.HEAT_RECOVERY);
 
-    particleEmission.enabled = Player.heat.currentHeat != 0;
+    coolOffParticleEmissionModule.enabled = Player.state.currentState.state == State.HEAT_RECOVERY;
+
+    heatParticleEmissionModule.enabled = Player.heat.currentHeat != 0;
     if (Player.heat.currentHeat < Player.heat.burnoutRecoveryThreshold)
-      particleEmission.rateOverTime = 10;
+      heatParticleEmissionModule.rateOverTime = 10;
     else if (!Player.heat.burnoutMode)
-      particleEmission.rateOverTime = 20;
+      heatParticleEmissionModule.rateOverTime = 20;
     else
-      particleEmission.rateOverTime = 50;
+      heatParticleEmissionModule.rateOverTime = 50;
 
   }
 
   private void HandleEnterDashingState(Player p) => animator.SetTrigger("Dash");
-  private void HandleDashMovementStart() => impulseSource.GenerateImpulse(dashScreenshakeStrength);
-  private void HandleExitDashingState(Player p) => animator.ResetTrigger("Dash");
+  private void HandleDashMovementStart()
+  {
+    cameraImpulseSource.GenerateImpulse(dashScreenshakeStrength);
+    feathersParticleEmissionModule.enabled = true;
+    // feathersParticleSystem.Emit(5);
+    dashTrailRenderer.emitting = true;
+  }
+  private void HandleExitDashingState(Player p)
+  {
+    animator.ResetTrigger("Dash");
+    feathersParticleEmissionModule.enabled = false;
+    dashTrailRenderer.emitting = false;
+  }
 }

@@ -17,6 +17,8 @@ public class Player : MonoBehaviour
 
   [Header("Burnout")]
   public float burnoutRunningSpeed = 20f;
+  public float burnoutDashStrength;
+  public float burnoutDashStartGracePeriod = 0.4f;
 
   // Components
   [NonSerialized] public Rigidbody2D rigidBody;
@@ -46,7 +48,7 @@ public class Player : MonoBehaviour
 
   void Update()
   {
-    if (input.DashPressed && input.movementVector.magnitude >= 0.1f && !heat.burnoutMode)
+    if (input.DashPressed && input.movementVector.magnitude >= 0.1f)
       state.TransitionToState(State.DASHING);
   }
 

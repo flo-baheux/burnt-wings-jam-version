@@ -10,6 +10,7 @@ public struct WorldLevels
   public int nbLevels;
 };
 
+[RequireComponent(typeof(GameSceneManager))]
 public class GameManager : MonoBehaviour
 {
   // CAMERAS
@@ -31,7 +32,7 @@ public class GameManager : MonoBehaviour
 
   // CONTROLLERS
   private MainAudioController audioController;
-  [SerializeField] private SceneController sceneController;
+  private GameSceneManager gameSceneManager;
 
   // PLAYER EVENTS
   public Action<Player> PlayerSpawned;
@@ -43,7 +44,7 @@ public class GameManager : MonoBehaviour
     Application.targetFrameRate = 60;
 
     audioController = GetComponent<MainAudioController>();
-    sceneController = new SceneController();
+    gameSceneManager = GetComponent<GameSceneManager>();
 
     foreach (WorldLevels wl in worldLevels)
       nbLevelsPerWorld[wl.worldId] = wl.nbLevels;
@@ -51,7 +52,7 @@ public class GameManager : MonoBehaviour
 
   public void Start()
   {
-    sceneController.LoadMainMenu();
+    gameSceneManager.LoadMainMenu();
     audioController.PlayMenuBGM();
   }
 
@@ -65,7 +66,7 @@ public class GameManager : MonoBehaviour
   {
     currentWorld = world;
     currentLevel = level;
-    sceneController.LoadGameScene($"world_{world}_level_{level}", (AsyncOperation sceneLoad) => SetupForLevel());
+    gameSceneManager.LoadGameScene($"world_{world}_level_{level}", SetupForLevel);
   }
 
   public void StartNextLevel()
@@ -97,7 +98,7 @@ public class GameManager : MonoBehaviour
   {
     player.state.deadState.OnEnter -= HandlePlayerDeath;
     Destroy(player.gameObject);
-    sceneController.ReloadCurrentScene((AsyncOperation sceneLoad) => SetupForLevel());
+    gameSceneManager.ReloadCurrentScene(SetupForLevel);
   }
 
   public void PauseResumeGame()
@@ -106,11 +107,11 @@ public class GameManager : MonoBehaviour
     {
       Time.timeScale = 0;
       player.input.controlsEnabled = false;
-      sceneController.LoadPauseScene();
+      gameSceneManager.LoadPauseScene();
     }
     else
     {
-      sceneController.UnloadPauseScene((AsyncOperation _) =>
+      gameSceneManager.UnloadPauseScene((AsyncOperation _) =>
       {
         Time.timeScale = 1;
         player.input.controlsEnabled = true;

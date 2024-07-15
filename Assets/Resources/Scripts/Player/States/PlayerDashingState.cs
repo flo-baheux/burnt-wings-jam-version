@@ -4,12 +4,10 @@ using UnityEngine;
 
 public class PlayerDashingState : PlayerState
 {
-  private float dashTime = 0.15f;
-  private float enterGracePeriod = 0.2f;
-  private float exitGracePeriod = 0.1f;
-  private bool isDashing = false;
+  private float dashTime = 0.15f, enterGracePeriod = 0.2f, exitGracePeriod = 0.1f;
+  private bool isDashing = false, isBurnoutModeAtStart;
   public bool canDash = false;
-  float initialGravityScale = 0f;
+  private float initialGravityScale = 0f;
   public Coroutine dashCoroutine = null;
 
   public PlayerDashingState(Player player) : base(player)
@@ -24,6 +22,7 @@ public class PlayerDashingState : PlayerState
     canDash = false;
     isDashing = true;
     initialGravityScale = Player.rigidBody.gravityScale;
+    isBurnoutModeAtStart = Player.heat.burnoutMode;
     dashCoroutine = Player.StartCoroutine(Dash());
     base.Enter();
   }
@@ -43,21 +42,21 @@ public class PlayerDashingState : PlayerState
     isDashing = false;
     Player.input.controlsEnabled = true;
     Player.rigidBody.gravityScale = initialGravityScale;
+
     base.Exit();
   }
 
   private IEnumerator Dash()
   {
-    Player.heat.IncreaseHeat(Player.GetCurrentDashCost());
     Player.input.controlsEnabled = false;
-
+    Player.heat.IncreaseHeat(Player.GetCurrentDashCost());
     Player.rigidBody.gravityScale = 0f;
     Player.rigidBody.velocity *= 0.1f;
 
     Vector2 dashDirection = GetDashDirection();
 
     float timer = 0f;
-    while (timer <= enterGracePeriod)
+    while (timer <= (isBurnoutModeAtStart ? Player.burnoutDashStartGracePeriod : enterGracePeriod))
     {
       if (Player.input.movementVector.magnitude > 0.1f)
         dashDirection = GetDashDirection();
@@ -66,7 +65,7 @@ public class PlayerDashingState : PlayerState
     }
 
     OnDashMovementStart?.Invoke();
-    Player.rigidBody.velocity = dashDirection * Player.DashStrength;
+    Player.rigidBody.velocity = dashDirection * (isBurnoutModeAtStart ? Player.burnoutDashStrength : Player.DashStrength);
     yield return new WaitForSeconds(dashTime);
 
     Player.rigidBody.velocity *= 0.1f;
