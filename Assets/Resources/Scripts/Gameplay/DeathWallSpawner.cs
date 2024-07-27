@@ -59,10 +59,10 @@ public class DeathWallSpawner : MonoBehaviour
   {
     return expensionDirection switch
     {
-      DeathWallExpensionDirection.UP => new Vector2(lastSpawnedAt.x + Random.Range(-2f, 2f), lastSpawnedAt.y + 0.8f),
-      DeathWallExpensionDirection.DOWN => new Vector2(lastSpawnedAt.x + Random.Range(-2f, 2f), lastSpawnedAt.y - 0.8f),
-      DeathWallExpensionDirection.LEFT => new Vector2(lastSpawnedAt.x - 0.8f, lastSpawnedAt.y + Random.Range(-2f, 2f)),
-      DeathWallExpensionDirection.RIGHT => new Vector2(lastSpawnedAt.x + 0.8f, lastSpawnedAt.y + Random.Range(-2f, 2f)),
+      DeathWallExpensionDirection.UP => new Vector2(lastSpawnedAt.x + Random.Range(-2f, 2f), lastSpawnedAt.y + 1f),
+      DeathWallExpensionDirection.DOWN => new Vector2(lastSpawnedAt.x + Random.Range(-2f, 2f), lastSpawnedAt.y - 1f),
+      DeathWallExpensionDirection.LEFT => new Vector2(lastSpawnedAt.x - 1f, lastSpawnedAt.y + Random.Range(-2f, 2f)),
+      DeathWallExpensionDirection.RIGHT => new Vector2(lastSpawnedAt.x + 1f, lastSpawnedAt.y + Random.Range(-2f, 2f)),
       _ => Vector2.zero,
     };
   }

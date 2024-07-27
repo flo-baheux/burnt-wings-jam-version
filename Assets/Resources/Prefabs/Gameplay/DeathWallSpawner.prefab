@@ -46,4 +46,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DeathWallPrefab: {fileID: 4497077598093732316, guid: 01885ec8ba9e123459c06f431a6f7d62, type: 3}
   expensionDirection: 1
-  expensionSpeed: 3
+  expensionSpeed: 5

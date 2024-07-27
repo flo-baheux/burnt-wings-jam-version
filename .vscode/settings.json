@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Burnt Wings.sln"
+    "dotnet.defaultSolution": "Steam-Version.sln"
 }

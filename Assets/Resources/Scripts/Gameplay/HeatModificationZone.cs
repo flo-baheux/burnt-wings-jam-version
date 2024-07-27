@@ -8,34 +8,41 @@ public class HeatModificationZone : MonoBehaviour
   [SerializeField] private float ticksEveryS = 2;
 
   private Player playerInZone = null;
+  Coroutine dealDamageCoroutine = null;
 
   public void OnTriggerEnter2D(Collider2D other)
   {
     other.gameObject.TryGetComponent(out Player player);
     if (player)
+    {
       playerInZone = player;
+      dealDamageCoroutine = StartCoroutine(DealDamageIfPlayerInZoneCoroutine());
+    }
   }
 
   public void OnTriggerExit2D(Collider2D other)
   {
     other.gameObject.TryGetComponent(out Player player);
     if (player)
+    {
       playerInZone = null;
+      StopCoroutine(dealDamageCoroutine);
+    }
   }
 
-  void Start()
+  IEnumerator DealDamageIfPlayerInZoneCoroutine()
   {
-    InvokeRepeating("DealDamageIfPlayerInZone", 0, ticksEveryS);
-  }
+    while (true)
+    {
+      if (!playerInZone)
+        yield break;
 
-  public void DealDamageIfPlayerInZone()
-  {
-    if (!playerInZone)
-      return;
 
-    if (heatModifier > 0)
-      playerInZone.heat.IncreaseHeat(heatModifier);
-    else if (heatModifier < 0)
-      playerInZone.heat.DecreaseHeat(heatModifier);
+      if (heatModifier > 0)
+        playerInZone.heat.IncreaseHeat(heatModifier);
+      else if (heatModifier < 0)
+        playerInZone.heat.DecreaseHeat(heatModifier);
+      yield return new WaitForSeconds(ticksEveryS);
+    }
   }
 }

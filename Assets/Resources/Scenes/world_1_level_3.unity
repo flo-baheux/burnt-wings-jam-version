@@ -430,6 +430,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8864632206305677261, guid: 88059929812806f4b8d63b46644ad807, type: 3}
       propertyPath: m_Size.y
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8864632206305677261, guid: 88059929812806f4b8d63b46644ad807, type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -766,6 +770,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8864632206305677261, guid: 88059929812806f4b8d63b46644ad807, type: 3}
       propertyPath: m_Size.y
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8864632206305677261, guid: 88059929812806f4b8d63b46644ad807, type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
